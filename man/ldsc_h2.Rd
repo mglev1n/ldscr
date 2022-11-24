@@ -38,3 +38,8 @@ A \link[tibble:tibble-package]{tibble} containing heritability information. If \
 \description{
 \code{ldsc_h2()} uses ldscore regression to estimate the heritability of a trait from GWAS summary statistics and reference LD information.
 }
+\examples{
+\donttest{
+ldsc_h2(sumstats_munged_example(dataframe = TRUE), ancestry = "EUR")
+}
+}

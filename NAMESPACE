@@ -3,6 +3,7 @@
 export("%>%")
 export(h2_liability)
 export(ldsc_h2)
+export(ldsc_rg)
 export(ldscore_files)
 export(sumstats_munged_example)
 importFrom(magrittr,"%>%")
