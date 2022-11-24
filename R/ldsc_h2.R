@@ -249,6 +249,11 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
 #' Convert Heritability to Liability Scale
 #'
+#' @description
+#'
+#' `h2_liability()` converts heritability estimates from the observed to liablity scale, and optionally calculates standard error and p-values for the estimate.
+#'
+#'
 #' @param h2 (numeric) Estimate of observed-scale heritability
 #' @param sample_prev (numeric) Proportion of cases in the current sample
 #' @param population_prev (numeric) Population prevalence of trait
