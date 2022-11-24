@@ -19,7 +19,7 @@ h2_liability(h2, sample_prev, population_prev, h2_se)
 A list containing liability-scale heritability, standard error, and p-value
 }
 \description{
-Convert Heritability to Liability Scale
+\code{h2_liability()} converts heritability estimates from the observed to liablity scale, and optionally calculates standard error and p-values for the estimate.
 }
 \examples{
 h2_liability(0.28, 0.1, 0.05)
