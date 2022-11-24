@@ -45,7 +45,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   I <- matrix(NA, nrow = n.traits, ncol = n.traits)
 
 
-  #########  READ LD SCORES:
+  # READ LD SCORES:
   cli::cli_progress_step("Reading LD Scores")
 
   if (missing(ancestry)) {
@@ -60,7 +60,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   x$MAF <- NULL
 
 
-  ######### READ weights:
+  # READ weights:
   cli::cli_progress_step("Reading weights")
   if (missing(ancestry)) {
     w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz") %>%
@@ -75,7 +75,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
   colnames(w)[ncol(w)] <- "wLD"
 
-  ### READ M
+  # READ M
   cli::cli_progress_step("Reading M")
   if (missing(ancestry)) {
     m <- fs::dir_ls(ld, glob = "*.l2.M_5_50") %>%
