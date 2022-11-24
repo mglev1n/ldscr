@@ -304,6 +304,9 @@ h2_liability <- function(h2, sample_prev, population_prev) {
 #' @return a list of paths
 #'
 #' @export
+#' @examples
+#' ldscore_files("AFR")
+#'
 ldscore_files <- function(ancestry, ...) {
   fs::dir_ls(fs::path(fs::path_package("extdata", package = "ldscr"), ancestry), ...)
 }
@@ -315,6 +318,8 @@ ldscore_files <- function(ancestry, ...) {
 #' @return either a [tibble][tibble::tibble-package] containing a munged dataframe, or a path to the file on disk.
 #'
 #' @export
+#' @examples
+#' sumstats_munged_example(dataframe = TRUE)
 sumstats_munged_example <- function(dataframe = TRUE) {
   if (dataframe) {
     vroom::vroom(fs::path(fs::path_package("extdata", "BMI-sumstats-munged.txt.gz", package = "ldscr")), col_types = vroom::cols())
