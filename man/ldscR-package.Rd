@@ -12,6 +12,7 @@ This package implements LD score regression in R.
 Useful links:
 \itemize{
   \item \url{https://github.com/mglev1n/ldscR}
+  \item \url{https://mglev1n.github.io/ldscR/}
   \item Report bugs at \url{https://github.com/mglev1n/ldscR/issues}
 }
 

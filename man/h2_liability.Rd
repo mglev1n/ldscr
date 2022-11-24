@@ -12,6 +12,8 @@ h2_liability(h2, sample_prev, population_prev, h2_se)
 \item{sample_prev}{(numeric) Proportion of cases in the current sample}
 
 \item{population_prev}{(numeric) Population prevalence of trait}
+
+\item{h2_se}{(numeric) Optional standard error of the observed-scale heritability estimate}
 }
 \value{
 A list containing liability-scale heritability, standard error, and p-value
