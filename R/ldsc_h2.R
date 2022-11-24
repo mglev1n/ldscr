@@ -1,5 +1,10 @@
 #' Estimate heritability
 #'
+#' @description
+#'
+#' `ldsc_h2()` uses ldscore regression to estimate the heritability of a trait from GWAS summary statistics and reference LD information.
+#'
+#'
 #' @param munged_sumstats Either a dataframe, or a path to a file containing munged summary statistics. Must contain at least columns named `SNP` (rsid), `A1` (effect allele), `A2` (non-effect allele), `N` (total sample size) and `Z` (Z-score)
 #' @param sample_prev (numeric) For binary traits, this should be the prevalence of cases in the current sample, used for conversion from observed heritability to liability-scale heritability. The default is `NA`, which is appropriate for quantitative traits or estimating heritability on the observed scale.
 #' @param ancestry (character) One of `AFR`, `AMR`, `CSA`, `EAS`, `EUR`, or `MID`, which will utilize the appropriate built-in `ld` and `wld` files from Pan-UK Biobank. If empty or `NULL`, the user must specify paths to `ld` and `wld` files.
@@ -9,21 +14,20 @@
 #' @param n_blocks (numeric) Number of blocks used to produce block jackknife standard errors. Default is `200`
 #' @param chisq_max (numeric) Maximum value of Z^2 for SNPs to be included in LD-score regression. Default is to set `chisq_max` to the maximum of 80 and N*0.001.
 #'
-#' @return a [tibble][tibble::tibble-package] of heritability information
-#'
+#' @return A [tibble][tibble::tibble-package] containing heritability information. If `sample_prev` and `population_prev` were provided, the heritability estimate are returned on the liability scale.
 #' @export
 #'
 
 ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev = NA, ld, wld, n_blocks = 200, chisq_max = NA) {
   # Check function arguments
-  # if (!missing(ancestry)) {
-  #   checkmate::assert_choice(ancestry, c("AFR", "AMR", "CSA", "EAS", "EUR", "MID"), null.ok = FALSE)
-  #   cli::cli_progress_step("Using {ancestry} reference from Pan-UKB")
-  # } else {
-  #   cli::cli_progress_step("No ancestry specified, checking for user-specified `ld` and `wld`")
-  #   checkmate::assert_character(ld)
-  #   checkmate::assert_character(wld)
-  # }
+  if (missing(ancestry)) {
+    cli::cli_progress_step("No ancestry specified, checking for user-specified `ld` and `wld`")
+    checkmate::assert_character(ld)
+    checkmate::assert_character(wld)
+  } else {
+    checkmate::assert_choice(ancestry, c("AFR", "AMR", "CSA", "EAS", "EUR", "MID"), null.ok = FALSE)
+    cli::cli_progress_step("Using {ancestry} reference from Pan-UKB")
+  }
 
   # Dimensions
   n.traits <- 1
@@ -40,8 +44,13 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   #########  READ LD SCORES:
   cli::cli_progress_step("Reading LD Scores")
 
-  x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
+  if (missing(ancestry)) {
+    x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
     vroom::vroom(col_types = vroom::cols())
+  } else {
+      x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
+      vroom::vroom(col_types = vroom::cols())
+    }
 
   x$CM <- NULL
   x$MAF <- NULL
@@ -49,8 +58,13 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
   ######### READ weights:
   cli::cli_progress_step("Reading weights")
-  w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz") %>%
-    vroom::vroom(col_types = vroom::cols())
+  if (missing(ancestry)) {
+    w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz") %>%
+      vroom::vroom(col_types = vroom::cols())
+  } else {
+    w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
+                      vroom::vroom(col_types = vroom::cols())
+  }
 
   w$CM <- NULL
   w$MAF <- NULL
@@ -59,19 +73,26 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
   ### READ M
   cli::cli_progress_step("Reading M")
-  m <- fs::dir_ls(ld, glob = "*.l2.M_5_50") %>%
-    vroom::vroom(col_types = vroom::cols(), col_names = FALSE, delim = "\t")
+  if (missing(ancestry)) {
+    m <- fs::dir_ls(ld, glob = "*.l2.M_5_50") %>%
+      vroom::vroom(col_types = vroom::cols(), col_names = FALSE, delim = "\t")
+  } else {
+    m <- ldscore_files(ancestry, glob = "*.l2.M_5_50") %>%
+      vroom::vroom(col_types = vroom::cols(), col_names = FALSE, delim = "\t")
+  }
+
 
   M.tot <- sum(m)
   m <- M.tot
 
   ### READ ALL CHI2 + MERGE WITH LDSC FILES
-  cli::cli_progress_step("Reading summary statistics")
   s <- 0
 
-  if (checkmate::check_character(munged_sumstats)) {
+  if (is.character(munged_sumstats)) {
+    cli::cli_progress_step("Reading summary statistics from {munged_sumstats}")
     sumstats_df <- vroom::vroom(munged_sumstats, col_types = vroom::cols())
-  } else if (checkmate::check_data_frame(munged_sumstats)) {
+  } else {
+    cli::cli_progress_step("Reading summary statistics from dataframe")
     sumstats_df <- munged_sumstats
   }
 
@@ -95,9 +116,6 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   cli::cli_progress_step("Estimating heritability")
 
   merged$chi1 <- merged$Z^2
-
-  samp.prev <- sample_prev
-  pop.prev <- population_prev
 
   n.snps <- nrow(merged)
 
@@ -184,8 +202,8 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   V.hold[, s] <- pseudo.values[, 1]
   N.vec[1, s] <- N.bar
 
-  if (is.na(pop.prev) == F & is.na(samp.prev) == F) {
-    conversion.factor <- (pop.prev^2 * (1 - pop.prev)^2) / (samp.prev * (1 - samp.prev) * dnorm(qnorm(1 - pop.prev))^2)
+  if (is.na(population_prev) == F & is.na(sample_prev) == F) {
+    conversion.factor <- (population_prev^2 * (1 - population_prev)^2) / (sample_prev * (1 - sample_prev) * dnorm(qnorm(1 - population_prev))^2)
     Liab.S <- conversion.factor
   }
 
@@ -210,4 +228,57 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   )
 
   return(res)
+}
+
+
+#' Convert Heritability to Liability Scale
+#'
+#' @param h2 (numeric) Estimate of observed-scale heritability
+#' @param sample_prev (numeric) Proportion of cases in the current sample
+#' @param population_prev (numeric) Population prevalence of trait
+#'
+#' @return Estimate of liability-scale heritability
+#' @export
+
+#' @examples
+#' h2_liability(0.28, 0.1, 0.05)
+#'
+h2_liability <- function(h2, sample_prev, population_prev) {
+
+  checkmate::assert_double(h2, lower = 0, upper = 1)
+  checkmate::assert_double(sample_prev, lower = 0, upper = 1)
+  checkmate::assert_double(population_prev, lower = 0, upper = 1)
+
+  K <- population_prev
+  P <- sample_prev
+  X <- qnorm(K,lower.tail=FALSE)
+  z <- (1/sqrt(2*pi))*(exp(-(X**2)/2))
+  h2lia <- h2*(K*(1-K)*K*(1-K))/(P*(1-P)*(z**2))
+  return(h2lia)
+}
+
+
+#' Paths to LD-score files from Pan-UKB
+#'
+#' @param ancestry One of `AFR`, `AMR`, `CSA`, `EAS`, `EUR`, or `MID`
+#'
+#' @return a list of paths
+#'
+#'
+ldscore_files <- function(ancestry, ...) {
+  fs::dir_ls(fs::path(fs::path_package("extdata", package = "ldscR"), ancestry), ...)
+}
+
+#' Example munged dataframe
+#'
+#' @param dataframe (logical) If `TRUE` (default), return an example munged dataframe. If `FALSE`, return path to the file on disk.
+#'
+#' @return either a [tibble][tibble::tibble-package] containing a munged dataframe, or a path to the file on disk.
+#'
+sumstats_munged_example <- function(dataframe = TRUE) {
+  if(dataframe) {
+    vroom::vroom(fs::path(fs::path_package("extdata", "BMI-sumstats-munged.txt.gz", package = "ldscR")), col_types = vroom::cols())
+  } else {
+    fs::path(fs::path_package("extdata", "BMI-sumstats-munged.txt.gz", package = "ldscR"))
+  }
 }
