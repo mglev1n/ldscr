@@ -213,7 +213,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   if (is.na(population_prev) == F & is.na(sample_prev) == F) {
     # conversion.factor <- (population_prev^2 * (1 - population_prev)^2) / (sample_prev * (1 - sample_prev) * dnorm(qnorm(1 - population_prev))^2)
     # Liab.S <- conversion.factor
-    h2_lia <- h2_liability(h2 = reg.tot, sample_prev, population_prev, h2_se = tot.se)
+    h2_lia <- h2_liability(h2 = reg.tot, sample_prev, population_prev)
 
     res <- tibble(
       mean_chisq = mean.Chi,
@@ -225,9 +225,9 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       h2_observed = reg.tot,
       h2_observed_se = tot.se,
       h2_Z = reg.tot / tot.se,
-      h2_liability = h2_lia$h2_liability,
-      h2_liability_se = h2_lia$h2_liability_se,
-      h2_liability_p = h2_lia$h2_liability_p
+      h2_p = 2*pnorm(abs(h2_Z), lower.tail = FALSE),
+      h2_liability = h2_lia,
+      h2_liability_se = h2_lia/h2_Z
     )
   } else {
     res <- tibble(
@@ -239,7 +239,8 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       ratio_se = ratio.se,
       h2_observed = reg.tot,
       h2_observed_se = tot.se,
-      h2_Z = reg.tot / tot.se
+      h2_Z = reg.tot / tot.se,
+      h2_p = 2*pnorm(h2_Z, lower.tail = FALSE)
     )
   }
 
@@ -251,20 +252,19 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 #'
 #' @description
 #'
-#' `h2_liability()` converts heritability estimates from the observed to liablity scale, and optionally calculates standard error and p-values for the estimate.
+#' `h2_liability()` converts heritability estimates from the observed to liability scale.
 #'
 #'
 #' @param h2 (numeric) Estimate of observed-scale heritability
 #' @param sample_prev (numeric) Proportion of cases in the current sample
 #' @param population_prev (numeric) Population prevalence of trait
-#' @param h2_se (numeric) Optional standard error of the observed-scale heritability estimate
 #' @return A list containing liability-scale heritability, standard error, and p-value
 #' @export
 
 #' @examples
 #' h2_liability(0.28, 0.1, 0.05)
 #'
-h2_liability <- function(h2, sample_prev, population_prev, h2_se) {
+h2_liability <- function(h2, sample_prev, population_prev) {
   checkmate::assert_double(h2, lower = 0, upper = 1)
   checkmate::assert_double(sample_prev, lower = 0, upper = 1)
   checkmate::assert_double(population_prev, lower = 0, upper = 1)
@@ -275,23 +275,24 @@ h2_liability <- function(h2, sample_prev, population_prev, h2_se) {
   zv <- dnorm(qnorm(K))
 
   h2_liab <- h2 * K^2 * (1 - K)^2 / P / (1 - P) / zv^2
-  if (!missing(h2_se)) {
-    checkmate::assert_double(h2_se, lower = 0)
-    var_h2_liab <- (h2_se * K^2 * (1 - K)^2 / P / (1 - P) / zv^2)^2
-    p_liab <- pchisq(h2_liab^2 / var_h2_liab, 1, lower.tail = F)
-
-    return(list(
-      h2_liability = h2_liab,
-      h2_liability_se = var_h2_liab,
-      h2_liability_p = p_liab
-    ))
-  } else {
-    list(
-      h2_liability = h2_liab,
-      h2_liability_se = NA,
-      h2_liability_p = NA
-    )
-  }
+  # if (!missing(h2_se)) {
+  #   checkmate::assert_double(h2_se, lower = 0)
+  #   var_h2_liab <- (h2_se * K^2 * (1 - K)^2 / P / (1 - P) / zv^2)^2
+  #   p_liab <- pchisq(h2_liab^2 / var_h2_liab, 1, lower.tail = F)
+  #
+  #   return(list(
+  #     h2_liability = h2_liab,
+  #     h2_liability_se = var_h2_liab,
+  #     h2_liability_p = p_liab
+  #   ))
+  # } else {
+  #   list(
+  #     h2_liability = h2_liab,
+  #     h2_liability_se = NA,
+  #     h2_liability_p = NA
+  #   )
+  # }
+  return(h2_liab)
 }
 
 
