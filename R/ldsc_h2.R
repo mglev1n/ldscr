@@ -305,7 +305,7 @@ h2_liability <- function(h2, sample_prev, population_prev) {
 #'
 #' @export
 ldscore_files <- function(ancestry, ...) {
-  fs::dir_ls(fs::path(fs::path_package("extdata", package = "ldscR"), ancestry), ...)
+  fs::dir_ls(fs::path(fs::path_package("extdata", package = "ldscr"), ancestry), ...)
 }
 
 #' Example munged dataframe
@@ -317,8 +317,8 @@ ldscore_files <- function(ancestry, ...) {
 #' @export
 sumstats_munged_example <- function(dataframe = TRUE) {
   if (dataframe) {
-    vroom::vroom(fs::path(fs::path_package("extdata", "BMI-sumstats-munged.txt.gz", package = "ldscR")), col_types = vroom::cols())
+    vroom::vroom(fs::path(fs::path_package("extdata", "BMI-sumstats-munged.txt.gz", package = "ldscr")), col_types = vroom::cols())
   } else {
-    fs::path(fs::path_package("extdata", "BMI-sumstats-munged.txt.gz", package = "ldscR"))
+    fs::path(fs::path_package("extdata", "BMI-sumstats-munged.txt.gz", package = "ldscr"))
   }
 }

@@ -1,4 +1,4 @@
-Package: ldscR
+Package: ldscr
 Title: LD Score Regression in R
 Version: 0.0.0.9000
 Authors@R: 
@@ -9,9 +9,9 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.2
-URL: https://github.com/mglev1n/ldscR,
-    https://mglev1n.github.io/ldscR/
-BugReports: https://github.com/mglev1n/ldscR/issues
+URL: https://github.com/mglev1n/ldscr,
+    https://mglev1n.github.io/ldscr/
+BugReports: https://github.com/mglev1n/ldscr/issues
 Imports: 
     checkmate,
     cli,

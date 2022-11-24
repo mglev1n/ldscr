@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/reference/test_package.html#special-files
 
 library(testthat)
-library(ldscR)
+library(ldscr)
 
-test_check("ldscR")
+test_check("ldscr")
