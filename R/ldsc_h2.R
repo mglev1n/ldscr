@@ -14,7 +14,7 @@
 #' @param n_blocks (numeric) Number of blocks used to produce block jackknife standard errors. Default is `200`
 #' @param chisq_max (numeric) Maximum value of Z^2 for SNPs to be included in LD-score regression. Default is to set `chisq_max` to the maximum of 80 and N*0.001.
 #'
-#' @return A [tibble][tibble::tibble-package] containing heritability information. If `sample_prev` and `population_prev` were provided, the heritability estimate are returned on the liability scale.
+#' @return A [tibble][tibble::tibble-package] containing heritability information. If `sample_prev` and `population_prev` were provided, the heritability estimate will also be returned on the liability scale.
 #' @export
 #'
 
@@ -46,11 +46,11 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
   if (missing(ancestry)) {
     x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
-    vroom::vroom(col_types = vroom::cols())
-  } else {
-      x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
       vroom::vroom(col_types = vroom::cols())
-    }
+  } else {
+    x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
+      vroom::vroom(col_types = vroom::cols())
+  }
 
   x$CM <- NULL
   x$MAF <- NULL
@@ -63,7 +63,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       vroom::vroom(col_types = vroom::cols())
   } else {
     w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-                      vroom::vroom(col_types = vroom::cols())
+      vroom::vroom(col_types = vroom::cols())
   }
 
   w$CM <- NULL
@@ -202,11 +202,6 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   V.hold[, s] <- pseudo.values[, 1]
   N.vec[1, s] <- N.bar
 
-  if (is.na(population_prev) == F & is.na(sample_prev) == F) {
-    conversion.factor <- (population_prev^2 * (1 - population_prev)^2) / (sample_prev * (1 - sample_prev) * dnorm(qnorm(1 - population_prev))^2)
-    Liab.S <- conversion.factor
-  }
-
   # cov[j, j] <- reg.tot
   # I[j, j] <- intercept
 
@@ -215,17 +210,38 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   ratio <- (intercept - 1) / (mean.Chi - 1)
   ratio.se <- intercept.se / (mean.Chi - 1)
 
-  res <- tibble(
-    mean_chisq = mean.Chi,
-    lambda_gc = lambda.gc,
-    intercept = intercept,
-    intercept_se = intercept.se,
-    ratio = ratio,
-    ratio_se = ratio.se,
-    h2_observed = reg.tot,
-    h2_observed_se = tot.se,
-    h2_Z = reg.tot / tot.se
-  )
+  if (is.na(population_prev) == F & is.na(sample_prev) == F) {
+    # conversion.factor <- (population_prev^2 * (1 - population_prev)^2) / (sample_prev * (1 - sample_prev) * dnorm(qnorm(1 - population_prev))^2)
+    # Liab.S <- conversion.factor
+    h2_lia <- h2_liability(h2 = reg.tot, sample_prev, population_prev, h2_se = tot.se)
+
+    res <- tibble(
+      mean_chisq = mean.Chi,
+      lambda_gc = lambda.gc,
+      intercept = intercept,
+      intercept_se = intercept.se,
+      ratio = ratio,
+      ratio_se = ratio.se,
+      h2_observed = reg.tot,
+      h2_observed_se = tot.se,
+      h2_Z = reg.tot / tot.se,
+      h2_liability = h2_lia$h2_liability,
+      h2_liability_se = h2_lia$h2_liability_se,
+      h2_liability_p = h2_lia$h2_liability_p
+    )
+  } else {
+    res <- tibble(
+      mean_chisq = mean.Chi,
+      lambda_gc = lambda.gc,
+      intercept = intercept,
+      intercept_se = intercept.se,
+      ratio = ratio,
+      ratio_se = ratio.se,
+      h2_observed = reg.tot,
+      h2_observed_se = tot.se,
+      h2_Z = reg.tot / tot.se
+    )
+  }
 
   return(res)
 }
@@ -237,34 +253,51 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 #' @param sample_prev (numeric) Proportion of cases in the current sample
 #' @param population_prev (numeric) Population prevalence of trait
 #'
-#' @return Estimate of liability-scale heritability
+#' @return A list containing liability-scale heritability, standard error, and p-value
 #' @export
 
 #' @examples
 #' h2_liability(0.28, 0.1, 0.05)
 #'
-h2_liability <- function(h2, sample_prev, population_prev) {
-
+h2_liability <- function(h2, sample_prev, population_prev, h2_se) {
   checkmate::assert_double(h2, lower = 0, upper = 1)
   checkmate::assert_double(sample_prev, lower = 0, upper = 1)
   checkmate::assert_double(population_prev, lower = 0, upper = 1)
 
+  # From equation 23 of https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3059431/ Estimating Missing Heritability for Disease from Genome-wide Association Studies
   K <- population_prev
   P <- sample_prev
-  X <- qnorm(K,lower.tail=FALSE)
-  z <- (1/sqrt(2*pi))*(exp(-(X**2)/2))
-  h2lia <- h2*(K*(1-K)*K*(1-K))/(P*(1-P)*(z**2))
-  return(h2lia)
+  zv <- dnorm(qnorm(K))
+
+  h2_liab <- h2 * K^2 * (1 - K)^2 / P / (1 - P) / zv^2
+  if (!missing(h2_se)) {
+    checkmate::assert_double(h2_se, lower = 0)
+    var_h2_liab <- (h2_se * K^2 * (1 - K)^2 / P / (1 - P) / zv^2)^2
+    p_liab <- pchisq(h2_liab^2 / var_h2_liab, 1, lower.tail = F)
+
+    return(list(
+      h2_liability = h2_liab,
+      h2_liability_se = var_h2_liab,
+      h2_liability_p = p_liab
+    ))
+  } else {
+    list(
+      h2_liability = h2_liab,
+      h2_liability_se = NA,
+      h2_liability_p = NA
+    )
+  }
 }
 
 
 #' Paths to LD-score files from Pan-UKB
 #'
 #' @param ancestry One of `AFR`, `AMR`, `CSA`, `EAS`, `EUR`, or `MID`
+#' @param ... arguments passed to `fs::dir_ls()`
 #'
 #' @return a list of paths
 #'
-#'
+#' @export
 ldscore_files <- function(ancestry, ...) {
   fs::dir_ls(fs::path(fs::path_package("extdata", package = "ldscR"), ancestry), ...)
 }
@@ -275,8 +308,9 @@ ldscore_files <- function(ancestry, ...) {
 #'
 #' @return either a [tibble][tibble::tibble-package] containing a munged dataframe, or a path to the file on disk.
 #'
+#' @export
 sumstats_munged_example <- function(dataframe = TRUE) {
-  if(dataframe) {
+  if (dataframe) {
     vroom::vroom(fs::path(fs::path_package("extdata", "BMI-sumstats-munged.txt.gz", package = "ldscR")), col_types = vroom::cols())
   } else {
     fs::path(fs::path_package("extdata", "BMI-sumstats-munged.txt.gz", package = "ldscR"))

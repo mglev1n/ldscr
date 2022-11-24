@@ -4,7 +4,7 @@
 \alias{h2_liability}
 \title{Convert Heritability to Liability Scale}
 \usage{
-h2_liability(h2, sample_prev, population_prev)
+h2_liability(h2, sample_prev, population_prev, h2_se)
 }
 \arguments{
 \item{h2}{(numeric) Estimate of observed-scale heritability}
@@ -14,7 +14,7 @@ h2_liability(h2, sample_prev, population_prev)
 \item{population_prev}{(numeric) Population prevalence of trait}
 }
 \value{
-Estimate of liability-scale heritability
+A list containing liability-scale heritability, standard error, and p-value
 }
 \description{
 Convert Heritability to Liability Scale

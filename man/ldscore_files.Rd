@@ -8,6 +8,8 @@ ldscore_files(ancestry, ...)
 }
 \arguments{
 \item{ancestry}{One of \code{AFR}, \code{AMR}, \code{CSA}, \code{EAS}, \code{EUR}, or \code{MID}}
+
+\item{...}{arguments passed to \code{fs::dir_ls()}}
 }
 \value{
 a list of paths

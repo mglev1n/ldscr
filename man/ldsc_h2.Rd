@@ -33,7 +33,7 @@ ldsc_h2(
 \item{chisq_max}{(numeric) Maximum value of Z^2 for SNPs to be included in LD-score regression. Default is to set \code{chisq_max} to the maximum of 80 and N*0.001.}
 }
 \value{
-A \link[tibble:tibble-package]{tibble} containing heritability information. If \code{sample_prev} and \code{population_prev} were provided, the heritability estimate are returned on the liability scale.
+A \link[tibble:tibble-package]{tibble} containing heritability information. If \code{sample_prev} and \code{population_prev} were provided, the heritability estimate will also be returned on the liability scale.
 }
 \description{
 \code{ldsc_h2()} uses ldscore regression to estimate the heritability of a trait from GWAS summary statistics and reference LD information.

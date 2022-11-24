@@ -16,7 +16,12 @@ test_that("Heritability estimation using munged dataframe works", {
   expect_equal(dim(ldsc_res), c(1, 9))
 })
 
+test_that("Heritability estimation on liability scale works", {
+  ldsc_res <- ldsc_h2(sumstats_munged_example(dataframe = TRUE), ancestry = "EUR", sample_prev = 0.2, population_prev = 0.01)
+  expect_equal(dim(ldsc_res), c(1, 12))
+})
+
 test_that("Conversion from observed to liability heritability works", {
-  expect_type(h2_liability(0.28, 0.1, 0.05), "double")
+  expect_type(h2_liability(0.28, 0.1, 0.05), "list")
 })
 
