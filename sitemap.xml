@@ -16,6 +16,9 @@
     <loc>/index.html</loc>
   </url>
   <url>
+    <loc>/reference/h2_liability.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
@@ -25,6 +28,12 @@
     <loc>/reference/ldsc_h2.html</loc>
   </url>
   <url>
+    <loc>/reference/ldscore_files.html</loc>
+  </url>
+  <url>
     <loc>/reference/pipe.html</loc>
+  </url>
+  <url>
+    <loc>/reference/sumstats_munged_example.html</loc>
   </url>
 </urlset>
