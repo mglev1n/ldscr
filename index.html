@@ -62,7 +62,30 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-This package implements LD score regression in R.
+<div class="section level1">
+<div class="page-header"><h1 id="ldscr">ldscR<a class="anchor" aria-label="anchor" href="#ldscr"></a>
+</h1></div>
+<!-- badges: start -->
+
+<p>The goal of ldscR is to provide functionality to perform heritability estimation using LD score regression within R.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>You can install the development version of ldscR from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"mglev1n/ldscR"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
+<p><code><a href="reference/ldsc_h2.html">ldsc_h2()</a></code> can be used to estimate heritability. Sample GWAS data is provided in <code><a href="reference/sumstats_munged_example.html">sumstats_munged_example()</a></code>. Users can utilize built-in LD reference data, or provide their own.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mglev1n/ldscR" class="external-link">ldscR</a></span><span class="op">)</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sumstats_munged_example.html">sumstats_munged_example</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ldsc_h2.html">ldsc_h2</a></span><span class="op">(</span>munged_sumstats <span class="op">=</span> <span class="va">df</span>, ancestry <span class="op">=</span> <span class="st">"EUR"</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -97,7 +120,13 @@ This package implements LD score regression in R.
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/mglev1n/ldscR/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/mglev1n/ldscR/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/mglev1n/ldscR/actions/workflows/test-coverage.yaml" class="external-link"><img src="https://github.com/mglev1n/ldscR/actions/workflows/test-coverage.yaml/badge.svg" alt="test-coverage"></a></li>
+</ul>
+</div>
 
   </div>
 </div>
