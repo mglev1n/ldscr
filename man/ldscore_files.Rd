@@ -17,3 +17,7 @@ a list of paths
 \description{
 Paths to LD-score files from Pan-UKB
 }
+\examples{
+ldscore_files("AFR")
+
+}

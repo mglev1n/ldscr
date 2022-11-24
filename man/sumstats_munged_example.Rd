@@ -15,3 +15,6 @@ either a \link[tibble:tibble-package]{tibble} containing a munged dataframe, or 
 \description{
 Example munged dataframe
 }
+\examples{
+sumstats_munged_example(dataframe = TRUE)
+}
