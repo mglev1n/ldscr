@@ -9,7 +9,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.2
-URL: https://github.com/mglev1n/ldscR
+URL: https://github.com/mglev1n/ldscR,
+    https://mglev1n.github.io/ldscR/
 BugReports: https://github.com/mglev1n/ldscR/issues
 Imports: 
     checkmate,
