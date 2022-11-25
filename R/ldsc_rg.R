@@ -21,13 +21,16 @@
 #'
 #' @export
 #'
+#' @import dtplyr
+#' @import data.table
+#'
 
 ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev = NA, ld, wld, n_blocks = 200, chisq_max = NA) {
   # Check function arguments
   if (missing(ancestry)) {
     cli::cli_progress_step("No ancestry specified, checking for user-specified `ld` and `wld`")
-    checkmate::assert_file_exists(ld)
-    checkmate::assert_file_exists(wld)
+    checkmate::assert_directory_exists(ld)
+    checkmate::assert_directory_exists(wld)
   } else {
     checkmate::assert_choice(ancestry, c("AFR", "AMR", "CSA", "EAS", "EUR", "MID"), null.ok = FALSE)
     cli::cli_progress_step("Using {ancestry} reference from Pan-UKB")
@@ -106,7 +109,9 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   M.tot <- sum(m)
   m <- M.tot
 
+  cli::cli_progress_step("Reading summary statistics")
   # READ summary statistics
+
   all_y <- purrr::imap(munged_sumstats, ~ {
     if (is.character(.x)) {
       cli::cli_progress_step("Reading summary statistics for '{.y}' from {.x}")
@@ -115,13 +120,20 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       cli::cli_progress_step("Reading summary statistics for '{.y}' from dataframe")
       sumstats_df <- .x
     }
+    sumstats_df <- na.omit(sumstats_df)
 
-    cli::cli_progress_step("Merging summary statistics with LD-score files")
-    merged <- dplyr::inner_join(sumstats_df, w %>% dplyr::select(SNP, wLD), by = "SNP") %>%
-      dplyr::inner_join(x, by = "SNP") %>%
-      dplyr::arrange(CHR, BP)
+    cli::cli_progress_step("Merging '{.y}' with LD-score files")
+    merged <- sumstats_df %>%
+      dtplyr::lazy_dt() %>%
+      dplyr::select(SNP, N, Z, A1) %>%
+      dplyr::inner_join(w[, c("SNP", "wLD")], by = c("SNP")) %>%
+      dplyr::inner_join(x, by = c("SNP")) %>%
+      dplyr::arrange(CHR, BP) %>%
+      na.omit() %>%
+      unique() %>%
+      tibble::as_tibble()
 
-    cli::cli_alert_info(glue::glue("{nrow(merged)}/{nrow(sumstats_df)} SNPs remain after merging with LD-score files"))
+    cli::cli_alert_info(glue::glue("{nrow(merged)}/{nrow(sumstats_df)} SNPs remain after merging '{.y}' with LD-score files"))
 
     ## REMOVE SNPS with excess chi-square:
     if (is.na(chisq_max)) {
@@ -130,8 +142,9 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     rm <- (merged$Z^2 > chisq_max)
     merged <- merged[!rm, ]
 
-    cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max}"))
+    cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max} from '{.y}'; {nrow(merged)} SNPs remain"))
 
+<<<<<<< HEAD
     cli::cli_progress_step("Merging '{.y}' with LD-score files")
     merged <- dplyr::inner_join(sumstats_df, w %>% dplyr::select(SNP, wLD), by = "SNP") %>%
       dplyr::inner_join(x, by = "SNP") %>%
@@ -148,6 +161,8 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
     cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max} from '{.y}'"))
 
+=======
+>>>>>>> 3528ac1 (Use dtplyr/data.table to speed up joining)
     return(merged)
   })
 
@@ -164,7 +179,7 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       ##### HERITABILITY code
       if (j == k) {
         trait <- names(munged_sumstats[j])
-        cli::cli_alert_info("Estimating heritability for '{trait}'")
+        cli::cli_progress_step("Estimating heritability for '{trait}'")
 
         samp.prev <- sample_prev[j]
         pop.prev <- population_prev[j]
@@ -249,8 +264,8 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
       if (j != k) {
         trait1 <- names(munged_sumstats[j])
-        trait2 <- names(munged_sumstats[j])
-        cli::cli_alert_info("Estimating genetic covariance for for '{trait1}' and '{trait2}'")
+        trait2 <- names(munged_sumstats[k])
+        cli::cli_progress_step("Estimating genetic covariance for for '{trait1}' and '{trait2}'")
 
         # .LOG("     ", file=log.file, print = FALSE)
 
@@ -293,6 +308,9 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
         # V.hold[, s] <- pseudo.values[, 1]
         # N.vec[1, s] <- N.bar
+
+        V.hold[, s] <- covariance_res$pseudo.values
+        N.vec[1, s] <- covariance_res$N.bar
 
         cov[k, j] <- cov[j, k] <- covariance_res$reg.tot
         I[k, j] <- I[j, k] <- covariance_res$intercept
@@ -408,7 +426,7 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     #   }
     # }
   } else {
-    warning("Your genetic covariance matrix includes traits estimated to have a negative heritability.")
+    cli::cli_alert_warning("Your genetic covariance matrix includes traits estimated to have a negative heritability.")
     # .LOG("Your genetic covariance matrix includes traits estimated to have a negative heritability.", file=log.file, print = FALSE)
     # .LOG("Genetic correlation results could not be computed due to negative heritability estimates.", file=log.file)
   }
@@ -436,9 +454,18 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     rg_se = SE_Stand[ind]
   )
 
+<<<<<<< HEAD
   list(
     h2 = h2_res,
     rg = rg_res,
     raw = list(V = V, S = S, I = I, N = N.vec, m = m, V_Stand = V_Stand, S_Stand = S_Stand, SE_Stand = SE_Stand)
+=======
+  return(
+    list(
+      h2 = h2_res,
+      rg = rg_res,
+      raw = list(V = V, S = S, I = I, N = N.vec, m = m, V_Stand = V_Stand, S_Stand = S_Stand, SE_Stand = SE_Stand)
+    )
+>>>>>>> 3528ac1 (Use dtplyr/data.table to speed up joining)
   )
 }

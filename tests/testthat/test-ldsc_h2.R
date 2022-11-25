@@ -26,3 +26,4 @@ test_that("Heritability estimation on liability scale works", {
 test_that("Conversion from observed to liability heritability works", {
   expect_type(h2_liability(0.28, 0.1, 0.05), "double")
 })
+

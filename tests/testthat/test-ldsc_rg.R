@@ -1,7 +1,7 @@
 test_that("ldsc_rg works with two traits", {
   rg_res <- ldsc_rg(
     munged_sumstats = list(
-      "BMI" = sumstats_munged_example(example = "BMI"),
+      "APOB" = sumstats_munged_example(example = "APOB"),
       "LDL" = sumstats_munged_example(example = "LDL")
     ),
     ancestry = "EUR"

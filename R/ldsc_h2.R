@@ -17,6 +17,9 @@
 #' @return A [tibble][tibble::tibble-package] containing heritability information. If `sample_prev` and `population_prev` were provided, the heritability estimate will also be returned on the liability scale.
 #' @export
 #'
+#' @import dtplyr
+#' @import data.table
+#'
 #' @examples
 #' \donttest{
 #' ldsc_h2(sumstats_munged_example(example = "BMI", dataframe = TRUE), ancestry = "EUR")
@@ -26,8 +29,8 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   # Check function arguments
   if (missing(ancestry)) {
     cli::cli_progress_step("No ancestry specified, checking for user-specified `ld` and `wld`")
-    checkmate::assert_character(ld)
-    checkmate::assert_character(wld)
+    checkmate::assert_directory_exists(ld)
+    checkmate::assert_directory_exists(wld)
   } else {
     checkmate::assert_choice(ancestry, c("AFR", "AMR", "CSA", "EAS", "EUR", "MID"), null.ok = FALSE)
     cli::cli_progress_step("Using {ancestry} reference from Pan-UKB")
@@ -83,13 +86,12 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       vroom::vroom(col_types = vroom::cols(), col_names = FALSE, delim = "\t")
   }
 
-
   M.tot <- sum(m)
   m <- M.tot
 
   ### READ ALL CHI2 + MERGE WITH LDSC FILES
   s <- 0
-
+  cli::cli_progress_step("Reading summary statistics")
   if (is.character(munged_sumstats)) {
     cli::cli_progress_step("Reading summary statistics from {munged_sumstats}")
     sumstats_df <- vroom::vroom(munged_sumstats, col_types = vroom::cols())
@@ -99,9 +101,15 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   }
 
   cli::cli_progress_step("Merging summary statistics with LD-score files")
-  merged <- dplyr::inner_join(sumstats_df, w %>% dplyr::select(SNP, wLD), by = "SNP") %>%
-    dplyr::inner_join(x, by = "SNP") %>%
-    dplyr::arrange(CHR, BP)
+  merged <- sumstats_df %>%
+    dtplyr::lazy_dt() %>%
+    dplyr::select(SNP, N, Z, A1) %>%
+    dplyr::inner_join(w[, c("SNP", "wLD")], by = c("SNP")) %>%
+    dplyr::inner_join(x, by = c("SNP")) %>%
+    dplyr::arrange(CHR, BP) %>%
+    na.omit() %>%
+    unique() %>%
+    tibble::as_tibble()
 
   cli::cli_alert_info(glue::glue("{nrow(merged)}/{nrow(sumstats_df)} SNPs remain after merging with LD-score files"))
 
@@ -112,7 +120,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   rm <- (merged$Z^2 > chisq_max)
   merged <- merged[!rm, ]
 
-  cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max}"))
+  cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max}; {nrow(merged)} SNPs remain"))
 
   ## ESTIMATE Heritability
   cli::cli_progress_step("Estimating heritability")
@@ -129,6 +137,8 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   ## MAKE WEIGHTS:
   initial.w <- make_weights(chi1 = merged$chi1, L2 = merged$L2, wLD = merged$wLD, N = merged$N, M.tot)
 
+  # return(list(merged, initial.w))
+
   merged$weights <- initial.w / sum(initial.w)
 
   N.bar <- mean(merged$N)
@@ -141,7 +151,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
   ## Perform analysis:
   analysis_res <- perform_analysis(n.blocks = n_blocks, n.snps, weighted.LD, weighted.chi, N.bar, m)
-  # browser()
+
   lambda.gc <- median(merged$chi1) / qchisq(0.5, df = 1)
   mean.Chi <- mean(merged$chi1)
   ratio <- (analysis_res$intercept - 1) / (mean.Chi - 1)
@@ -261,9 +271,8 @@ make_weights <- function(chi1, L2, wLD, N, M.tot) {
   oc.w <- 1 / w.ld
   w <- het.w * oc.w
   initial.w <- sqrt(w)
-  # merged$weights <- merged$initial.w/sum(merged$initial.w)
-  #
-  # N.bar <- mean(merged$N)
+
+  return(initial.w)
 }
 
 # Internal function to perform LDSC heritability/covariance analysis

@@ -15,7 +15,9 @@ BugReports: https://github.com/mglev1n/ldscr/issues
 Imports: 
     checkmate,
     cli,
+    data.table,
     dplyr,
+    dtplyr,
     fs,
     gdata,
     glue,
