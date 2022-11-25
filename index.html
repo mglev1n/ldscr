@@ -62,7 +62,7 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>The goal of ldscr is to provide functionality to perform heritability estimation using LD score regression within R.</p>
+<p>The goal of ldscr is to provide functionality to estimate genetic heritability and cross-trait genetic correlations from GWAS summary statistics using LD score regression within R.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -78,7 +78,16 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mglev1n/ldscr" class="external-link">ldscr</a></span><span class="op">)</span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sumstats_munged_example.html">sumstats_munged_example</a></span><span class="op">(</span>example <span class="op">=</span> <span class="st">"BMI"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/ldsc_h2.html">ldsc_h2</a></span><span class="op">(</span>munged_sumstats <span class="op">=</span> <span class="va">df</span>, ancestry <span class="op">=</span> <span class="st">"EUR"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">h2_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ldsc_h2.html">ldsc_h2</a></span><span class="op">(</span>munged_sumstats <span class="op">=</span> <span class="va">df</span>, ancestry <span class="op">=</span> <span class="st">"EUR"</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="reference/ldsc_rg.html">ldsc_rg()</a></code> can be used to estimate cross-trait genetic correlations between two or more traits.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rg_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ldsc_rg.html">ldsc_rg</a></span><span class="op">(</span></span>
+<span>  munged_sumstats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="st">"APOB"</span> <span class="op">=</span> <span class="fu"><a href="reference/sumstats_munged_example.html">sumstats_munged_example</a></span><span class="op">(</span>example <span class="op">=</span> <span class="st">"APOB"</span><span class="op">)</span>,</span>
+<span>    <span class="st">"LDL"</span> <span class="op">=</span> <span class="fu"><a href="reference/sumstats_munged_example.html">sumstats_munged_example</a></span><span class="op">(</span>example <span class="op">=</span> <span class="st">"LDL"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  ancestry <span class="op">=</span> <span class="st">"EUR"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
