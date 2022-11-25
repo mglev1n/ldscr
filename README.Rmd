@@ -1,5 +1,7 @@
 ---
 output: github_document
+csl: https://raw.githubusercontent.com/citation-style-language/styles/6152ccea8b7d7a472910d36524d1bf3557a83bfc/dependent/nature-genetics.csl
+bibliography: references.bib
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -16,11 +18,12 @@ knitr::opts_chunk$set(
 # ldscr
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/mglev1n/ldscr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mglev1n/ldscr/actions/workflows/R-CMD-check.yaml)
-[![test-coverage](https://github.com/mglev1n/ldscr/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/mglev1n/ldscr/actions/workflows/test-coverage.yaml)
+
+[![R-CMD-check](https://github.com/mglev1n/ldscr/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mglev1n/ldscr/actions/workflows/R-CMD-check.yaml) [![test-coverage](https://github.com/mglev1n/ldscr/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/mglev1n/ldscr/actions/workflows/test-coverage.yaml)
+
 <!-- badges: end -->
 
-The goal of ldscr is to provide functionality to estimate genetic heritability and cross-trait genetic correlations from GWAS summary statistics using LD score regression within R.
+The goal of ldscr is to provide functionality to estimate genetic heritability and cross-trait genetic correlations from GWAS summary statistics using LD score regression within R. Details of LD score regression for estimation of heritabliity and genetic correlations have been previously published.[@Bulik-Sullivan2015; @Bulik-Sullivan2015a] This package adapts code and functionality originally implemented in [GenomicSEM](https://github.com/GenomicSEM/GenomicSEM).[@Grotzinger2019]
 
 ## Installation
 
@@ -34,7 +37,6 @@ devtools::install_github("mglev1n/ldscr")
 ## Usage
 
 `ldsc_h2()` can be used to estimate heritability. Sample GWAS data is provided in `sumstats_munged_example()`. Users can utilize built-in LD reference data, or provide their own.
-
 
 ```{r ldsc_h2_example, eval=FALSE}
 library(ldscr)
@@ -53,3 +55,5 @@ rg_res <- ldsc_rg(
   ancestry = "EUR"
 )
 ```
+
+## References
