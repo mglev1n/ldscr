@@ -48,12 +48,16 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sumstats_munged_example</span><span class="op">(</span>dataframe <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sumstats_munged_example</span><span class="op">(</span><span class="va">example</span>, dataframe <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
     <h2 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h2>
-    <dl><dt>dataframe</dt>
+    <dl><dt>example</dt>
+<dd><p>(character) One of <code>BMI</code> or <code>LDL</code> which have been included as example traits.</p></dd>
+
+
+<dt>dataframe</dt>
 <dd><p>(logical) If <code>TRUE</code> (default), return an example munged dataframe. If <code>FALSE</code>, return path to the file on disk.</p></dd>
 
 </dl></div>
@@ -64,6 +68,25 @@
 <p>either a <a href="https://tibble.tidyverse.org/reference/tibble-package.html" class="external-link">tibble</a> containing a munged dataframe, or a path to the file on disk.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">sumstats_munged_example</span><span class="op">(</span>example <span class="op">=</span> <span class="st">"BMI"</span>, dataframe <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,168,351 × 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    SNP             N      Z A1    A2   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> rs1000000  <span style="text-decoration: underline;">336</span>107 -<span style="color: #BB0000;">0.642</span> A     G    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> rs10000010 <span style="text-decoration: underline;">336</span>107 -<span style="color: #BB0000;">0.263</span> C     T    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> rs1000002  <span style="text-decoration: underline;">336</span>107 -<span style="color: #BB0000;">2.32</span>  T     C    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> rs10000023 <span style="text-decoration: underline;">336</span>107  1.01  G     T    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> rs1000003  <span style="text-decoration: underline;">336</span>107 -<span style="color: #BB0000;">1.49</span>  G     A    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> rs10000033 <span style="text-decoration: underline;">336</span>107  0.964 C     T    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> rs10000036 <span style="text-decoration: underline;">336</span>107  0.247 C     T    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> rs10000037 <span style="text-decoration: underline;">336</span>107  1.24  A     G    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> rs10000041 <span style="text-decoration: underline;">336</span>107 -<span style="color: #BB0000;">1.09</span>  G     T    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> rs1000007  <span style="text-decoration: underline;">336</span>107 -<span style="color: #BB0000;">1.02</span>  C     T    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 1,168,341 more rows</span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
