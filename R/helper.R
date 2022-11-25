@@ -37,7 +37,6 @@ read_m <- function(ancestry, ld) {
 
 # Read summary statistics from either internal or external file
 read_sumstats <- function(munged_sumstats, name) {
-
   # Check if name is present to enable more informative logging
   if (missing(name)) {
     if (is.character(munged_sumstats)) {
