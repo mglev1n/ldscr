@@ -132,24 +132,24 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
     cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max}"))
 
-      cli::cli_progress_step("Merging '{.y}' with LD-score files")
-      merged <- dplyr::inner_join(sumstats_df, w %>% dplyr::select(SNP, wLD), by = "SNP") %>%
-        dplyr::inner_join(x, by = "SNP") %>%
-        dplyr::arrange(CHR, BP)
+    cli::cli_progress_step("Merging '{.y}' with LD-score files")
+    merged <- dplyr::inner_join(sumstats_df, w %>% dplyr::select(SNP, wLD), by = "SNP") %>%
+      dplyr::inner_join(x, by = "SNP") %>%
+      dplyr::arrange(CHR, BP)
 
-      cli::cli_alert_info(glue::glue("{nrow(merged)}/{nrow(sumstats_df)} SNPs remain after merging '{.y}' with LD-score files"))
+    cli::cli_alert_info(glue::glue("{nrow(merged)}/{nrow(sumstats_df)} SNPs remain after merging '{.y}' with LD-score files"))
 
-      ## REMOVE SNPS with excess chi-square:
-      if (is.na(chisq_max)) {
-        chisq_max <- max(0.001 * max(merged$N), 80)
-      }
-      rm <- (merged$Z^2 > chisq_max)
-      merged <- merged[!rm, ]
+    ## REMOVE SNPS with excess chi-square:
+    if (is.na(chisq_max)) {
+      chisq_max <- max(0.001 * max(merged$N), 80)
+    }
+    rm <- (merged$Z^2 > chisq_max)
+    merged <- merged[!rm, ]
 
-      cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max} from '{.y}'"))
+    cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max} from '{.y}'"))
 
-      return(merged)
-    })
+    return(merged)
+  })
 
   # count the total nummer of runs, both loops
   s <- 1
@@ -161,7 +161,6 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     y1$chi1 <- y1$Z^2
 
     for (k in j:n.traits) {
-
       ##### HERITABILITY code
       if (j == k) {
         trait <- names(munged_sumstats[j])
@@ -208,40 +207,41 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
             bind_rows(
               tibble(
                 trait = trait,
-            mean_chisq = mean.Chi,
-            lambda_gc = lambda.gc,
-            intercept = analysis_res$intercept,
-            intercept_se = analysis_res$intercept.se,
-            ratio = ratio,
-            ratio_se = ratio.se,
-            h2_observed = analysis_res$reg.tot,
-            h2_observed_se = analysis_res$tot.se,
-            h2_Z = analysis_res$reg.tot / analysis_res$tot.se,
-            h2_p = 2 * pnorm(abs(h2_Z), lower.tail = FALSE),
-            h2_liability = h2_lia,
-            h2_liability_se = h2_lia / h2_Z
-          ))
+                mean_chisq = mean.Chi,
+                lambda_gc = lambda.gc,
+                intercept = analysis_res$intercept,
+                intercept_se = analysis_res$intercept.se,
+                ratio = ratio,
+                ratio_se = ratio.se,
+                h2_observed = analysis_res$reg.tot,
+                h2_observed_se = analysis_res$tot.se,
+                h2_Z = analysis_res$reg.tot / analysis_res$tot.se,
+                h2_p = 2 * pnorm(abs(h2_Z), lower.tail = FALSE),
+                h2_liability = h2_lia,
+                h2_liability_se = h2_lia / h2_Z
+              )
+            )
         } else {
           h2_res <- h2_res %>%
             bind_rows(
               tibble(
                 trait = trait,
-            mean_chisq = mean.Chi,
-            lambda_gc = lambda.gc,
-            intercept = analysis_res$intercept,
-            intercept_se = analysis_res$intercept.se,
-            ratio = ratio,
-            ratio_se = ratio.se,
-            h2_observed = analysis_res$reg.tot,
-            h2_observed_se = analysis_res$tot.se,
-            h2_Z = analysis_res$reg.tot / analysis_res$tot.se,
-            h2_p = 2 * pnorm(abs(h2_Z), lower.tail = FALSE)
-          ))
+                mean_chisq = mean.Chi,
+                lambda_gc = lambda.gc,
+                intercept = analysis_res$intercept,
+                intercept_se = analysis_res$intercept.se,
+                ratio = ratio,
+                ratio_se = ratio.se,
+                h2_observed = analysis_res$reg.tot,
+                h2_observed_se = analysis_res$tot.se,
+                h2_Z = analysis_res$reg.tot / analysis_res$tot.se,
+                h2_p = 2 * pnorm(abs(h2_Z), lower.tail = FALSE)
+              )
+            )
         }
 
         cov[j, j] <- analysis_res$reg.tot
         I[j, j] <- analysis_res$intercept
-
       }
 
 
@@ -427,14 +427,18 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   # flush(log.file)
   # close(log.file)
 
-  ind <- which( upper.tri(S,diag=F) , arr.ind = TRUE )
+  ind <- which(upper.tri(S, diag = F), arr.ind = TRUE)
 
-  rg_res <- tibble(trait1 = dimnames(S_Stand)[[2]][ind[,2]],
-              trait2 = dimnames(S_Stand)[[1]][ind[,1]],
-              rg = S_Stand[ind],
-              rg_se = SE_Stand[ind])
+  rg_res <- tibble(
+    trait1 = dimnames(S_Stand)[[2]][ind[, 2]],
+    trait2 = dimnames(S_Stand)[[1]][ind[, 1]],
+    rg = S_Stand[ind],
+    rg_se = SE_Stand[ind]
+  )
 
-  list(h2 = h2_res,
-       rg = rg_res,
-       raw = list(V = V, S = S, I = I, N = N.vec, m = m, V_Stand = V_Stand, S_Stand = S_Stand, SE_Stand = SE_Stand))
+  list(
+    h2 = h2_res,
+    rg = rg_res,
+    raw = list(V = V, S = S, I = I, N = N.vec, m = m, V_Stand = V_Stand, S_Stand = S_Stand, SE_Stand = SE_Stand)
+  )
 }
