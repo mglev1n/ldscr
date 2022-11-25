@@ -43,3 +43,9 @@ A list of heritablilty and genetic correlation information
 \description{
 \code{ldsc_rg()} uses ldscore regression to estimate the pairwise genetic correlations between traits. The function relies on named lists of traits, sample prevalences, and populatin prevalences. The name of each trait should be consistent across each argument.
 }
+\examples{
+\donttest{
+ldsc_rg(munged_sumstats = list("APOB" = sumstats_munged_example(example = "APOB"), "LDL" = sumstats_munged_example(example = "LDL")), ancestry = "EUR")
+}
+
+}
