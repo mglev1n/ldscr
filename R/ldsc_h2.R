@@ -50,66 +50,29 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
   # READ LD SCORES:
   cli::cli_progress_step("Reading LD Scores")
-
-  if (missing(ancestry)) {
-    x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
-      vroom::vroom(col_types = vroom::cols())
-  } else {
-    x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-      vroom::vroom(col_types = vroom::cols())
-  }
-
+  x <- read_ld(ancestry, ld)
   x$CM <- x$MAF <- NULL
 
 
   # READ weights:
   cli::cli_progress_step("Reading weights")
-  if (missing(ancestry)) {
-    w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz") %>%
-      vroom::vroom(col_types = vroom::cols())
-  } else {
-    w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-      vroom::vroom(col_types = vroom::cols())
-  }
-
+  w <- read_wld(ancestry, wld)
   w$CM <- w$MAF <- NULL
-
   colnames(w)[ncol(w)] <- "wLD"
 
   # READ M
   cli::cli_progress_step("Reading M")
-  if (missing(ancestry)) {
-    m <- fs::dir_ls(ld, glob = "*.l2.M_5_50") %>%
-      vroom::vroom(col_types = vroom::cols(), col_names = FALSE, delim = "\t")
-  } else {
-    m <- ldscore_files(ancestry, glob = "*.l2.M_5_50") %>%
-      vroom::vroom(col_types = vroom::cols(), col_names = FALSE, delim = "\t")
-  }
-
+  m <- read_m(ancestry, ld)
   M.tot <- sum(m)
   m <- M.tot
 
   ### READ ALL CHI2 + MERGE WITH LDSC FILES
   s <- 0
   cli::cli_progress_step("Reading summary statistics")
-  if (is.character(munged_sumstats)) {
-    cli::cli_progress_step("Reading summary statistics from {munged_sumstats}")
-    sumstats_df <- vroom::vroom(munged_sumstats, col_types = vroom::cols())
-  } else {
-    cli::cli_progress_step("Reading summary statistics from dataframe")
-    sumstats_df <- munged_sumstats
-  }
+  sumstats_df <- read_sumstats(munged_sumstats)
 
   cli::cli_progress_step("Merging summary statistics with LD-score files")
-  merged <- sumstats_df %>%
-    dtplyr::lazy_dt() %>%
-    dplyr::select(SNP, N, Z, A1) %>%
-    dplyr::inner_join(w[, c("SNP", "wLD")], by = c("SNP")) %>%
-    dplyr::inner_join(x, by = c("SNP")) %>%
-    dplyr::arrange(CHR, BP) %>%
-    na.omit() %>%
-    unique() %>%
-    tibble::as_tibble()
+  merged <- merge_sumstats(sumstats_df, w, x)
 
   cli::cli_alert_info(glue::glue("{nrow(merged)}/{nrow(sumstats_df)} SNPs remain after merging with LD-score files"))
 
@@ -227,115 +190,4 @@ h2_liability <- function(h2, sample_prev, population_prev) {
 }
 
 
-#' Paths to LD-score files from Pan-UKB
-#'
-#' @param ancestry (character) One of "AFR", "AMR", "CSA", "EAS", "EUR", or "MID"
-#' @param ... arguments passed to `fs::dir_ls()`
-#'
-#' @return a list of paths
-#'
-#' @export
-#' @examples
-#' ldscore_files("AFR")
-#'
-ldscore_files <- function(ancestry, ...) {
-  fs::dir_ls(fs::path(fs::path_package("extdata", package = "ldscr"), ancestry), ...)
-}
 
-#' Example munged dataframe
-#'
-#' @param dataframe (logical) If `TRUE` (default), return an example munged dataframe. If `FALSE`, return path to the file on disk.
-#' @param example (character) One of "BMI" or "LDL" which have been included as example traits.
-#' @return either a [tibble][tibble::tibble-package] containing a munged dataframe, or a path to the file on disk.
-#'
-#' @export
-#' @examples
-#' sumstats_munged_example(example = "BMI", dataframe = TRUE)
-sumstats_munged_example <- function(example, dataframe = TRUE) {
-  if (dataframe) {
-    vroom::vroom(fs::path(fs::path_package("extdata", paste0(example, "-sumstats-munged.txt.gz"), package = "ldscr")), col_types = vroom::cols())
-  } else {
-    fs::path(fs::path_package("extdata", paste0(example, "-sumstats-munged.txt.gz"), package = "ldscr"))
-  }
-}
-
-# Internal Function to make weights:
-make_weights <- function(chi1, L2, wLD, N, M.tot) {
-  tot.agg <- (M.tot * (mean(chi1) - 1)) / mean(L2 * N)
-  tot.agg <- max(tot.agg, 0)
-  tot.agg <- min(tot.agg, 1)
-  ld <- pmax(L2, 1)
-  w.ld <- pmax(wLD, 1)
-  c <- tot.agg * N / M.tot
-  het.w <- 1 / (2 * (1 + (c * ld))^2)
-  oc.w <- 1 / w.ld
-  w <- het.w * oc.w
-  initial.w <- sqrt(w)
-
-  return(initial.w)
-}
-
-# Internal function to perform LDSC heritability/covariance analysis
-perform_analysis <- function(n.blocks, n.snps, weighted.LD, weighted.chi, N.bar, m) {
-  n.annot <- 1
-
-  select.from <- floor(seq(from = 1, to = n.snps, length.out = (n.blocks + 1)))
-  select.to <- c(select.from[2:n.blocks] - 1, n.snps)
-
-  xty.block.values <- matrix(data = NA, nrow = n.blocks, ncol = (n.annot + 1))
-  xtx.block.values <- matrix(data = NA, nrow = ((n.annot + 1) * n.blocks), ncol = (n.annot + 1))
-  colnames(xty.block.values) <- colnames(xtx.block.values) <- colnames(weighted.LD)
-  replace.from <- seq(from = 1, to = nrow(xtx.block.values), by = (n.annot + 1))
-  replace.to <- seq(from = (n.annot + 1), to = nrow(xtx.block.values), by = (n.annot + 1))
-  for (i in 1:n.blocks) {
-    xty.block.values[i, ] <- t(t(weighted.LD[select.from[i]:select.to[i], ]) %*% weighted.chi[select.from[i]:select.to[i], ])
-    xtx.block.values[replace.from[i]:replace.to[i], ] <- as.matrix(t(weighted.LD[select.from[i]:select.to[i], ]) %*% weighted.LD[select.from[i]:select.to[i], ])
-  }
-  xty <- as.matrix(colSums(xty.block.values))
-  xtx <- matrix(data = NA, nrow = (n.annot + 1), ncol = (n.annot + 1))
-  colnames(xtx) <- colnames(weighted.LD)
-  for (i in 1:nrow(xtx)) {
-    xtx[i, ] <- t(colSums(xtx.block.values[seq(from = i, to = nrow(xtx.block.values), by = ncol(weighted.LD)), ]))
-  }
-
-  reg <- solve(xtx, xty)
-  intercept <- reg[2]
-  coefs <- reg[1] / N.bar
-  reg.tot <- coefs * m
-
-  delete.from <- seq(from = 1, to = nrow(xtx.block.values), by = ncol(xtx.block.values))
-  delete.to <- seq(from = ncol(xtx.block.values), to = nrow(xtx.block.values), by = ncol(xtx.block.values))
-  delete.values <- matrix(data = NA, nrow = n.blocks, ncol = (n.annot + 1))
-  colnames(delete.values) <- colnames(weighted.LD)
-  for (i in 1:n.blocks) {
-    xty.delete <- xty - xty.block.values[i, ]
-    xtx.delete <- xtx - xtx.block.values[delete.from[i]:delete.to[i], ]
-    delete.values[i, ] <- solve(xtx.delete, xty.delete)
-  }
-
-  tot.delete.values <- delete.values[, 1:n.annot]
-  pseudo.values <- matrix(data = NA, nrow = n.blocks, ncol = length(reg))
-  colnames(pseudo.values) <- colnames(weighted.LD)
-  for (i in 1:n.blocks) {
-    pseudo.values[i, ] <- (n.blocks * reg) - ((n.blocks - 1) * delete.values[i, ])
-  }
-
-  jackknife.cov <- cov(pseudo.values) / n.blocks
-  jackknife.se <- sqrt(diag(jackknife.cov))
-  intercept.se <- jackknife.se[length(jackknife.se)]
-  coef.cov <- jackknife.cov[1:n.annot, 1:n.annot] / (N.bar^2)
-  cat.cov <- coef.cov * (m %*% t(m))
-  tot.cov <- sum(cat.cov)
-  tot.se <- sqrt(tot.cov)
-
-  return(
-    list(
-      reg.tot = reg.tot,
-      tot.se = tot.se,
-      intercept = intercept,
-      intercept.se = intercept.se,
-      pseudo.values = pseudo.values[, 1],
-      N.bar = N.bar
-    )
-  )
-}

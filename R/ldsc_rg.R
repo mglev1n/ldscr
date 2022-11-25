@@ -125,7 +125,8 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       cli::cli_progress_step("Reading summary statistics for '{.y}' from dataframe")
       sumstats_df <- .x
     }
-    sumstats_df <- na.omit(sumstats_df)
+
+    # sumstats_df <- na.omit(sumstats_df)
 
     cli::cli_progress_step("Merging '{.y}' with LD-score files")
     merged <- sumstats_df %>%
