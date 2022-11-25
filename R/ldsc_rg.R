@@ -33,7 +33,7 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
   checkmate::assert_list(munged_sumstats)
 
-  if(missing(sample_prev)) {
+  if (missing(sample_prev)) {
     cli::cli_alert_info("No sample prevalence data provided. Estimating heritabilities on the observed scale.")
   }
 
@@ -51,11 +51,11 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   }
 
   # Storage:
-  cov <- matrix(NA,nrow=n.traits,ncol=n.traits)
-  V.hold <- matrix(NA,nrow=n.blocks,ncol=n.V)
-  N.vec <- matrix(NA,nrow=1,ncol=n.V)
+  cov <- matrix(NA, nrow = n.traits, ncol = n.traits)
+  V.hold <- matrix(NA, nrow = n.blocks, ncol = n.V)
+  N.vec <- matrix(NA, nrow = 1, ncol = n.V)
   Liab.S <- rep(1, n.traits)
-  I <- matrix(NA,nrow=n.traits,ncol=n.traits)
+  I <- matrix(NA, nrow = n.traits, ncol = n.traits)
 
   # READ LD SCORES:
   cli::cli_progress_step("Reading LD Scores")
@@ -96,6 +96,4 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     m <- ldscore_files(ancestry, glob = "*.l2.M_5_50") %>%
       vroom::vroom(col_types = vroom::cols(), col_names = FALSE, delim = "\t")
   }
-
-
 }

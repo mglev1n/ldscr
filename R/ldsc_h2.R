@@ -21,7 +21,7 @@
 #' \donttest{
 #' ldsc_h2(sumstats_munged_example(dataframe = TRUE), ancestry = "EUR")
 #' }
-
+#'
 ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev = NA, ld, wld, n_blocks = 200, chisq_max = NA) {
   # Check function arguments
   if (missing(ancestry)) {
@@ -229,9 +229,9 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       h2_observed = reg.tot,
       h2_observed_se = tot.se,
       h2_Z = reg.tot / tot.se,
-      h2_p = 2*pnorm(abs(h2_Z), lower.tail = FALSE),
+      h2_p = 2 * pnorm(abs(h2_Z), lower.tail = FALSE),
       h2_liability = h2_lia,
-      h2_liability_se = h2_lia/h2_Z
+      h2_liability_se = h2_lia / h2_Z
     )
   } else {
     res <- tibble(
@@ -244,7 +244,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       h2_observed = reg.tot,
       h2_observed_se = tot.se,
       h2_Z = reg.tot / tot.se,
-      h2_p = 2*pnorm(h2_Z, lower.tail = FALSE)
+      h2_p = 2 * pnorm(h2_Z, lower.tail = FALSE)
     )
   }
 

@@ -236,7 +236,7 @@ ldsc <- function(traits, sample.prev, population.prev, ld, wld,
 
         initial.w <- make_weights(chi1 = merged$chi1, L2 = merged$L2, wLD = merged$wLD, N = merged$N, M.tot)
 
-        merged$weights <- initial.w/sum(initial.w)
+        merged$weights <- initial.w / sum(initial.w)
 
         N.bar <- mean(merged$N)
 
@@ -490,7 +490,7 @@ make_weights <- function(chi1, L2, wLD, N, M.tot) {
 }
 
 # Perform Analysis
-perform_analysis <- function(n.blocks, n.snps, weighted.LD, weighted.chi, N.bar, m){
+perform_analysis <- function(n.blocks, n.snps, weighted.LD, weighted.chi, N.bar, m) {
   n.annot <- 1
 
   select.from <- floor(seq(from = 1, to = n.snps, length.out = (n.blocks + 1)))
@@ -551,5 +551,4 @@ perform_analysis <- function(n.blocks, n.snps, weighted.LD, weighted.chi, N.bar,
       N.bar = N.bar
     )
   )
-
 }
