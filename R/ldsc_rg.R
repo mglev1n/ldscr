@@ -73,44 +73,20 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
   # READ LD SCORES:
   cli::cli_progress_step("Reading LD Scores")
-
-  if (missing(ancestry)) {
-    x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
-      vroom::vroom(col_types = vroom::cols())
-  } else {
-    x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-      vroom::vroom(col_types = vroom::cols())
-  }
-
-  x$CM <- NULL
-  x$MAF <- NULL
+  x <- read_ld(ancestry, ld)
+  x$CM <- x$MAF <- NULL
 
 
   # READ weights:
   cli::cli_progress_step("Reading weights")
-  if (missing(ancestry)) {
-    w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz") %>%
-      vroom::vroom(col_types = vroom::cols())
-  } else {
-    w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-      vroom::vroom(col_types = vroom::cols())
-  }
-
-  w$CM <- NULL
-  w$MAF <- NULL
-
+  w <- read_wld(ancestry, wld)
+  w$CM <- w$MAF <- NULL
   colnames(w)[ncol(w)] <- "wLD"
+
 
   # READ M
   cli::cli_progress_step("Reading M")
-  if (missing(ancestry)) {
-    m <- fs::dir_ls(ld, glob = "*.l2.M_5_50") %>%
-      vroom::vroom(col_types = vroom::cols(), col_names = FALSE, delim = "\t")
-  } else {
-    m <- ldscore_files(ancestry, glob = "*.l2.M_5_50") %>%
-      vroom::vroom(col_types = vroom::cols(), col_names = FALSE, delim = "\t")
-  }
-
+  m <- read_m(ancestry, ld)
   M.tot <- sum(m)
   m <- M.tot
 
@@ -129,15 +105,7 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     # sumstats_df <- na.omit(sumstats_df)
 
     cli::cli_progress_step("Merging '{.y}' with LD-score files")
-    merged <- sumstats_df %>%
-      dtplyr::lazy_dt() %>%
-      dplyr::select(SNP, N, Z, A1) %>%
-      dplyr::inner_join(w[, c("SNP", "wLD")], by = c("SNP")) %>%
-      dplyr::inner_join(x, by = c("SNP")) %>%
-      dplyr::arrange(CHR, BP) %>%
-      na.omit() %>%
-      unique() %>%
-      tibble::as_tibble()
+    merged <- merge_sumstats(sumstats_df, w, x)
 
     cli::cli_alert_info(glue::glue("{nrow(merged)}/{nrow(sumstats_df)} SNPs remain after merging '{.y}' with LD-score files"))
 

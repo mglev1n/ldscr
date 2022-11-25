@@ -8,7 +8,7 @@ test_that("ldsc_rg works with two traits", {
   )
 
   expect_type(rg_res, "list")
-  expect_equal(nrow(rg_res$rg), 1)
+  expect_s3_class(rg_res$rg, "data.frame")
 })
 
 test_that("ldsc_rg works with three traits", {
