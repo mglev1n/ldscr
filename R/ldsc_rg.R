@@ -248,6 +248,10 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       ##### GENETIC COVARIANCE code
 
       if (j != k) {
+        trait1 <- names(munged_sumstats[j])
+        trait2 <- names(munged_sumstats[j])
+        cli::cli_alert_info("Estimating genetic covariance for for '{trait1}' and '{trait2}'")
+
         # .LOG("     ", file=log.file, print = FALSE)
 
         # chi2 <- traits[k]
@@ -433,14 +437,4 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   list(h2 = h2_res,
        rg = rg_res,
        raw = list(V = V, S = S, I = I, N = N.vec, m = m, V_Stand = V_Stand, S_Stand = S_Stand, SE_Stand = SE_Stand))
-
-  # if (stand) {
-  #   list(V = V, S = S, I = I, N = N.vec, m = m, V_Stand = V_Stand, S_Stand = S_Stand, SE_Stand = SE_Stand)
-  # } else {
-  #   list(V = V, S = S, I = I, N = N.vec, m = m)
-  # }
->>>>>>> 9e0380f (ldsc_rg now works)
-
-    return(merged)
-  })
 }
