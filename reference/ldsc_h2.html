@@ -67,7 +67,7 @@
 
 
 <dt>ancestry</dt>
-<dd><p>(character) One of <code>AFR</code>, <code>AMR</code>, <code>CSA</code>, <code>EAS</code>, <code>EUR</code>, or <code>MID</code>, which will utilize the appropriate built-in <code>ld</code> and <code>wld</code> files from Pan-UK Biobank. If empty or <code>NULL</code>, the user must specify paths to <code>ld</code> and <code>wld</code> files.</p></dd>
+<dd><p>(character) One of "AFR", "AMR", "CSA", "EAS", "EUR", or "MID", which will utilize the appropriate built-in <code>ld</code> and <code>wld</code> files from Pan-UK Biobank. If empty or <code>NULL</code>, the user must specify paths to <code>ld</code> and <code>wld</code> files.</p></dd>
 
 
 <dt>sample_prev</dt>
@@ -106,32 +106,32 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu">ldsc_h2</span><span class="op">(</span><span class="fu"><a href="sumstats_munged_example.html">sumstats_munged_example</a></span><span class="op">(</span>example <span class="op">=</span> <span class="st">"BMI"</span>, dataframe <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, ancestry <span class="op">=</span> <span class="st">"EUR"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using EUR reference from Pan-UKB</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Using EUR reference from Pan-UKB <span style="color: #B2B2B2;">[26ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Using EUR reference from Pan-UKB <span style="color: #B2B2B2;">[27ms]</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading LD Scores</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading LD Scores <span style="color: #B2B2B2;">[491ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading LD Scores <span style="color: #B2B2B2;">[505ms]</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading weights</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading weights <span style="color: #B2B2B2;">[358ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading weights <span style="color: #B2B2B2;">[369ms]</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading M</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading M <span style="color: #B2B2B2;">[25ms]</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading summary statistics</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading summary statistics <span style="color: #B2B2B2;">[343ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading summary statistics <span style="color: #B2B2B2;">[350ms]</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading summary statistics from dataframe</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading summary statistics from dataframe <span style="color: #B2B2B2;">[17ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading summary statistics from dataframe <span style="color: #B2B2B2;">[18ms]</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Merging summary statistics with LD-score files</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> 1075707/1168351 SNPs remain after merging with LD-score files</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Merging summary statistics with LD-score files</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Removed 20 SNPs with Chi^2 &gt; 336.107; 1075687 SNPs remain</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Merging summary statistics with LD-score files</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Merging summary statistics with LD-score files <span style="color: #B2B2B2;">[10.4s]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Merging summary statistics with LD-score files <span style="color: #B2B2B2;">[10.6s]</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Estimating heritability</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Estimating heritability <span style="color: #B2B2B2;">[493ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Estimating heritability <span style="color: #B2B2B2;">[588ms]</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 10</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   mean_…¹ lambd…² inter…³ inter…⁴  ratio ratio…⁵ h2_ob…⁶ h2_ob…⁷  h2_Z      h2_p</span>
