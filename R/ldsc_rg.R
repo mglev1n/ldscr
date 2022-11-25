@@ -101,33 +101,31 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   }
 
   # READ summary statistics
-  all_y <- purrr::imap(munged_sumstats, ~{
-      if (is.character(.x)) {
-        cli::cli_progress_step("Reading summary statistics for '{.y}' from {.x}")
-        sumstats_df <- vroom::vroom(.x, col_types = vroom::cols())
-      } else {
-        cli::cli_progress_step("Reading summary statistics for '{.y}' from dataframe")
-        sumstats_df <- .x
-      }
+  all_y <- purrr::imap(munged_sumstats, ~ {
+    if (is.character(.x)) {
+      cli::cli_progress_step("Reading summary statistics for '{.y}' from {.x}")
+      sumstats_df <- vroom::vroom(.x, col_types = vroom::cols())
+    } else {
+      cli::cli_progress_step("Reading summary statistics for '{.y}' from dataframe")
+      sumstats_df <- .x
+    }
 
-      cli::cli_progress_step("Merging summary statistics with LD-score files")
-      merged <- dplyr::inner_join(sumstats_df, w %>% dplyr::select(SNP, wLD), by = "SNP") %>%
-        dplyr::inner_join(x, by = "SNP") %>%
-        dplyr::arrange(CHR, BP)
+    cli::cli_progress_step("Merging summary statistics with LD-score files")
+    merged <- dplyr::inner_join(sumstats_df, w %>% dplyr::select(SNP, wLD), by = "SNP") %>%
+      dplyr::inner_join(x, by = "SNP") %>%
+      dplyr::arrange(CHR, BP)
 
-      cli::cli_alert_info(glue::glue("{nrow(merged)}/{nrow(sumstats_df)} SNPs remain after merging with LD-score files"))
+    cli::cli_alert_info(glue::glue("{nrow(merged)}/{nrow(sumstats_df)} SNPs remain after merging with LD-score files"))
 
-      ## REMOVE SNPS with excess chi-square:
-      if (is.na(chisq_max)) {
-        chisq_max <- max(0.001 * max(merged$N), 80)
-      }
-      rm <- (merged$Z^2 > chisq_max)
-      merged <- merged[!rm, ]
+    ## REMOVE SNPS with excess chi-square:
+    if (is.na(chisq_max)) {
+      chisq_max <- max(0.001 * max(merged$N), 80)
+    }
+    rm <- (merged$Z^2 > chisq_max)
+    merged <- merged[!rm, ]
 
-      cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max}"))
+    cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max}"))
 
-      return(merged)
-    })
-
-
+    return(merged)
+  })
 }
