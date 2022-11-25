@@ -30,6 +30,6 @@ reference data, or provide their own.
 
 ``` r
 library(ldscr)
-df <- sumstats_munged_example()
+df <- sumstats_munged_example(example = "BMI")
 ldsc_h2(munged_sumstats = df, ancestry = "EUR")
 ```

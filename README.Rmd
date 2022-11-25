@@ -39,7 +39,7 @@ devtools::install_github("mglev1n/ldscr")
 
 ```{r example, eval=FALSE}
 library(ldscr)
-df <- sumstats_munged_example()
+df <- sumstats_munged_example(example = "BMI")
 ldsc_h2(munged_sumstats = df, ancestry = "EUR")
 ```
 

@@ -19,7 +19,7 @@
 #'
 #' @examples
 #' \donttest{
-#' ldsc_h2(sumstats_munged_example(dataframe = TRUE), ancestry = "EUR")
+#' ldsc_h2(sumstats_munged_example(example = "BMI", dataframe = TRUE), ancestry = "EUR")
 #' }
 #'
 ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev = NA, ld, wld, n_blocks = 200, chisq_max = NA) {
@@ -235,17 +235,17 @@ ldscore_files <- function(ancestry, ...) {
 #' Example munged dataframe
 #'
 #' @param dataframe (logical) If `TRUE` (default), return an example munged dataframe. If `FALSE`, return path to the file on disk.
-#'
+#' @param example (character) One of `BMI` or `LDL` which have been included as example traits.
 #' @return either a [tibble][tibble::tibble-package] containing a munged dataframe, or a path to the file on disk.
 #'
 #' @export
 #' @examples
-#' sumstats_munged_example(dataframe = TRUE)
-sumstats_munged_example <- function(dataframe = TRUE) {
+#' sumstats_munged_example(example = "BMI", dataframe = TRUE)
+sumstats_munged_example <- function(example, dataframe = TRUE) {
   if (dataframe) {
-    vroom::vroom(fs::path(fs::path_package("extdata", "BMI-sumstats-munged.txt.gz", package = "ldscr")), col_types = vroom::cols())
+    vroom::vroom(fs::path(fs::path_package("extdata", paste0(example, "-sumstats-munged.txt.gz"), package = "ldscr")), col_types = vroom::cols())
   } else {
-    fs::path(fs::path_package("extdata", "BMI-sumstats-munged.txt.gz", package = "ldscr"))
+    fs::path(fs::path_package("extdata", paste0(example, "-sumstats-munged.txt.gz"), package = "ldscr"))
   }
 }
 

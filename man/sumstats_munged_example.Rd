@@ -4,9 +4,11 @@
 \alias{sumstats_munged_example}
 \title{Example munged dataframe}
 \usage{
-sumstats_munged_example(dataframe = TRUE)
+sumstats_munged_example(example, dataframe = TRUE)
 }
 \arguments{
+\item{example}{(character) One of \code{BMI} or \code{LDL} which have been included as example traits.}
+
 \item{dataframe}{(logical) If \code{TRUE} (default), return an example munged dataframe. If \code{FALSE}, return path to the file on disk.}
 }
 \value{
@@ -16,5 +18,5 @@ either a \link[tibble:tibble-package]{tibble} containing a munged dataframe, or 
 Example munged dataframe
 }
 \examples{
-sumstats_munged_example(dataframe = TRUE)
+sumstats_munged_example(example = "BMI", dataframe = TRUE)
 }

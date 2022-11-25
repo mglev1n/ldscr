@@ -35,8 +35,9 @@ ldsc_rg(
 \value{
 A list of heritablilty and genetic correlation information
 \itemize{
-\item \code{rg} = \link[tibble:tibble-package]{tibble} containing pairwise genetic correlations information.
 \item \code{h2} = \link[tibble:tibble-package]{tibble} containing heritability information for each trait. If \code{sample_prev} and \code{population_prev} were provided, the heritability estimates will also be returned on the liability scale.
+\item \code{rg} = \link[tibble:tibble-package]{tibble} containing pairwise genetic correlations information.
+\item \code{raw} = A list of correlation/covariance matrices
 }
 }
 \description{

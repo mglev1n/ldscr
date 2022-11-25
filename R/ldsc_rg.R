@@ -15,8 +15,10 @@
 #' @param chisq_max (numeric) Maximum value of Z^2 for SNPs to be included in LD-score regression. Default is to set `chisq_max` to the maximum of 80 and N*0.001.
 #'
 #' @return A list of heritablilty and genetic correlation information
-#'  - `rg` = [tibble][tibble::tibble-package] containing pairwise genetic correlations information.
 #'  - `h2` = [tibble][tibble::tibble-package] containing heritability information for each trait. If `sample_prev` and `population_prev` were provided, the heritability estimates will also be returned on the liability scale.
+#'  - `rg` = [tibble][tibble::tibble-package] containing pairwise genetic correlations information.
+#'  - `raw` = A list of correlation/covariance matrices
+#'
 #' @export
 #'
 
@@ -59,6 +61,7 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   N.vec <- matrix(NA, nrow = 1, ncol = n.V)
   Liab.S <- rep(1, n.traits)
   I <- matrix(NA, nrow = n.traits, ncol = n.traits)
+  h2_res <- tibble()
 
   # READ LD SCORES:
   cli::cli_progress_step("Reading LD Scores")
@@ -100,6 +103,9 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       vroom::vroom(col_types = vroom::cols(), col_names = FALSE, delim = "\t")
   }
 
+  M.tot <- sum(m)
+  m <- M.tot
+
   # READ summary statistics
   all_y <- purrr::imap(munged_sumstats, ~ {
     if (is.character(.x)) {
@@ -125,6 +131,315 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     merged <- merged[!rm, ]
 
     cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max}"))
+
+      cli::cli_progress_step("Merging '{.y}' with LD-score files")
+      merged <- dplyr::inner_join(sumstats_df, w %>% dplyr::select(SNP, wLD), by = "SNP") %>%
+        dplyr::inner_join(x, by = "SNP") %>%
+        dplyr::arrange(CHR, BP)
+
+      cli::cli_alert_info(glue::glue("{nrow(merged)}/{nrow(sumstats_df)} SNPs remain after merging '{.y}' with LD-score files"))
+
+      ## REMOVE SNPS with excess chi-square:
+      if (is.na(chisq_max)) {
+        chisq_max <- max(0.001 * max(merged$N), 80)
+      }
+      rm <- (merged$Z^2 > chisq_max)
+      merged <- merged[!rm, ]
+
+      cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max} from '{.y}'"))
+
+      return(merged)
+    })
+
+  # count the total nummer of runs, both loops
+  s <- 1
+
+  for (j in 1:n.traits) {
+    # chi1 <- traits[j]
+
+    y1 <- all_y[[j]]
+    y1$chi1 <- y1$Z^2
+
+    for (k in j:n.traits) {
+
+      ##### HERITABILITY code
+      if (j == k) {
+        trait <- names(munged_sumstats[j])
+        cli::cli_alert_info("Estimating heritability for '{trait}'")
+
+        samp.prev <- sample_prev[j]
+        pop.prev <- population_prev[j]
+
+        merged <- y1
+        n.snps <- nrow(merged)
+
+        ## ADD INTERCEPT:
+        merged$intercept <- 1
+        merged$x.tot <- merged$L2
+        merged$x.tot.intercept <- 1
+
+        initial.w <- make_weights(chi1 = merged$chi1, L2 = merged$L2, wLD = merged$wLD, N = merged$N, M.tot)
+
+        merged$weights <- initial.w / sum(initial.w)
+
+        N.bar <- mean(merged$N)
+
+        ## preweight LD and chi:
+        weighted.LD <- as.matrix(cbind(merged$L2, merged$intercept) * merged$weights)
+        weighted.chi <- as.matrix(merged$chi1 * merged$weights)
+
+        ## Perform analysis:
+        analysis_res <- perform_analysis(n.blocks, n.snps, weighted.LD, weighted.chi, N.bar, m)
+
+        V.hold[, s] <- analysis_res$pseudo.values
+        N.vec[1, s] <- analysis_res$N.bar
+
+        lambda.gc <- median(merged$chi1) / qchisq(0.5, df = 1)
+        mean.Chi <- mean(merged$chi1)
+        ratio <- (analysis_res$intercept - 1) / (mean.Chi - 1)
+        ratio.se <- analysis_res$intercept.se / (mean.Chi - 1)
+
+        if (is.na(population_prev) == F & is.na(sample_prev) == F) {
+          # conversion.factor <- (population_prev^2 * (1 - population_prev)^2) / (sample_prev * (1 - sample_prev) * dnorm(qnorm(1 - population_prev))^2)
+          # Liab.S <- conversion.factor
+          h2_lia <- h2_liability(h2 = analysis_res$reg.tot, sample_prev, population_prev)
+
+          h2_res <- h2_res %>%
+            bind_rows(
+              tibble(
+                trait = trait,
+            mean_chisq = mean.Chi,
+            lambda_gc = lambda.gc,
+            intercept = analysis_res$intercept,
+            intercept_se = analysis_res$intercept.se,
+            ratio = ratio,
+            ratio_se = ratio.se,
+            h2_observed = analysis_res$reg.tot,
+            h2_observed_se = analysis_res$tot.se,
+            h2_Z = analysis_res$reg.tot / analysis_res$tot.se,
+            h2_p = 2 * pnorm(abs(h2_Z), lower.tail = FALSE),
+            h2_liability = h2_lia,
+            h2_liability_se = h2_lia / h2_Z
+          ))
+        } else {
+          h2_res <- h2_res %>%
+            bind_rows(
+              tibble(
+                trait = trait,
+            mean_chisq = mean.Chi,
+            lambda_gc = lambda.gc,
+            intercept = analysis_res$intercept,
+            intercept_se = analysis_res$intercept.se,
+            ratio = ratio,
+            ratio_se = ratio.se,
+            h2_observed = analysis_res$reg.tot,
+            h2_observed_se = analysis_res$tot.se,
+            h2_Z = analysis_res$reg.tot / analysis_res$tot.se,
+            h2_p = 2 * pnorm(abs(h2_Z), lower.tail = FALSE)
+          ))
+        }
+
+        cov[j, j] <- analysis_res$reg.tot
+        I[j, j] <- analysis_res$intercept
+
+      }
+
+
+      ##### GENETIC COVARIANCE code
+
+      if (j != k) {
+        # .LOG("     ", file=log.file, print = FALSE)
+
+        # chi2 <- traits[k]
+        # .LOG("Calculating genetic covariance [", s, "/", n.V, "] for traits: ", chi1, " and ", chi2, file=log.file)
+
+        # Reuse the data read in for heritability
+        y2 <- all_y[[k]]
+        y <- merge(y1, y2[, c("SNP", "N", "Z", "A1")], by = "SNP", sort = FALSE)
+
+        y$Z.x <- ifelse(y$A1.y == y$A1.x, y$Z.x, -y$Z.x)
+        y$ZZ <- y$Z.y * y$Z.x
+        y$chi2 <- y$Z.y^2
+        merged <- na.omit(y)
+        n.snps <- nrow(merged)
+
+        # .LOG(n.snps, " SNPs remain after merging ", chi1, " and ", chi2, " summary statistics", file=log.file)
+
+        ## ADD INTERCEPT:
+        merged$intercept <- 1
+        merged$x.tot <- merged$L2
+        merged$x.tot.intercept <- 1
+
+
+        #### MAKE WEIGHTS:
+        initial.w <- make_weights(chi1 = merged$chi1, L2 = merged$L2, wLD = merged$wLD, N = merged$N.x, M.tot)
+        initial.w2 <- make_weights(chi1 = merged$chi2, L2 = merged$L2, wLD = merged$wLD, N = merged$N.y, M.tot)
+
+        merged$weights_cov <- (initial.w + initial.w2) / sum(initial.w + initial.w2)
+
+        N.bar <- sqrt(mean(merged$N.x) * mean(merged$N.y))
+
+        ## preweight LD and chi:
+
+        weighted.LD <- as.matrix(cbind(merged$L2, merged$intercept) * merged$weights)
+        weighted.chi <- as.matrix(merged$ZZ * merged$weights_cov)
+
+        ## Perform analysis:
+        covariance_res <- perform_analysis(n.blocks, n.snps, weighted.LD, weighted.chi, N.bar, m)
+
+        # V.hold[, s] <- pseudo.values[, 1]
+        # N.vec[1, s] <- N.bar
+
+        cov[k, j] <- cov[j, k] <- covariance_res$reg.tot
+        I[k, j] <- I[j, k] <- covariance_res$intercept
+
+        # .LOG("Results for genetic covariance between: ", chi1, " and ", chi2, file=log.file)
+        # .LOG("Mean Z*Z: ", round(mean(merged$ZZ), 4), file=log.file)
+        # .LOG("Cross trait Intercept: ", round(intercept, 4), " (", round(intercept.se, 4), ")", file=log.file)
+        # .LOG("Total Observed Scale Genetic Covariance (g_cov): ", round(reg.tot, 4), " (", round(tot.se, 4), ")", file=log.file)
+        # .LOG("g_cov Z: ", format(reg.tot / tot.se, digits = 3), file=log.file)
+        # .LOG("g_cov P-value: ", format(2 * pnorm(abs(reg.tot / tot.se), lower.tail = FALSE), digits = 5), file=log.file)
+      }
+
+      ### Total count
+      s <- s + 1
+    }
+  }
+
+
+  ## Scale V to N per study (assume m constant)
+  # /!\ crossprod instead of tcrossprod because N.vec is a one-row matrix
+  v.out <- cov(V.hold) / crossprod(N.vec * (sqrt(n.blocks) / m))
+
+  ### Scale S and V to liability:
+  ratio <- tcrossprod(sqrt(Liab.S))
+  S <- cov * ratio
+
+  # calculate the ratio of the rescaled and original S matrices
+  scaleO <- gdata::lowerTriangle(ratio, diag = TRUE)
+
+  # rescale the sampling correlation matrix by the appropriate diagonals
+  V <- v.out * tcrossprod(scaleO)
+
+
+  # name traits according to the names of the input summart statistics
+  # use general format of V1-VX if no names provided
+  colnames(S) <- if (is.null(names(munged_sumstats))) paste0("V", 1:ncol(S)) else names(munged_sumstats)
+  rownames(S) <- if (is.null(names(munged_sumstats))) paste0("V", 1:ncol(S)) else names(munged_sumstats)
+
+  if (mean(Liab.S) != 1) {
+    r <- nrow(S)
+    SE <- matrix(0, r, r)
+    SE[lower.tri(SE, diag = TRUE)] <- sqrt(diag(V))
+
+    # for (j in 1:n.traits) {
+    #   if (is.null(trait.names)) {
+    #     chi1 <- traits[j]
+    #   } else {
+    #     chi1 <- trait.names[j]
+    #   }
+    #   for (k in j:length(traits)) {
+    #     if (j == k) {
+    #       # .LOG("     ", file=log.file, print = FALSE)
+    #       # .LOG("Liability scale results for: ", chi1, file=log.file)
+    #       # .LOG("Total Liability Scale h2: ", round(S[j, j], 4), " (", round(SE[j, j], 4), ")", file=log.file)
+    #     }
+    #
+    #     if (j != k) {
+    #       if (is.null(trait.names)) {
+    #         chi2 <- traits[k]
+    #       } else {
+    #         chi2 <- trait.names[k]
+    #       }
+    #       # .LOG("Total Liability Scale Genetic Covariance between ", chi1, " and ",
+    #       # chi2, ": ", round(S[k, j], 4), " (", round(SE[k, j], 4), ")", file=log.file)
+    #       # .LOG("     ", file=log.file, print = FALSE)
+    #     }
+    #   }
+    # }
+  }
+
+
+  if (all(diag(S) > 0)) {
+    ## calculate standardized results to print genetic correlations to log and screen
+    ratio <- tcrossprod(1 / sqrt(diag(S)))
+    S_Stand <- S * ratio
+
+    # calculate the ratio of the rescaled and original S matrices
+    scaleO <- gdata::lowerTriangle(ratio, diag = TRUE)
+
+    ## Make sure that if ratio in NaN (devision by zero) we put the zero back in
+    # -> not possible because of 'all(diag(S) > 0)'
+    # scaleO[is.nan(scaleO)] <- 0
+
+    # rescale the sampling correlation matrix by the appropriate diagonals
+    V_Stand <- V * tcrossprod(scaleO)
+
+    # enter SEs from diagonal of standardized V
+    r <- nrow(S)
+    SE_Stand <- matrix(0, r, r)
+    SE_Stand[lower.tri(SE_Stand, diag = TRUE)] <- sqrt(diag(V_Stand))
+
+
+    # .LOG(c("     ", "     "), file=log.file, print = FALSE)
+    # .LOG("Genetic Correlation Results", file=log.file)
+
+    # for (j in 1:n.traits) {
+    #   if (is.null(trait.names)) {
+    #     chi1 <- traits[j]
+    #   } else {
+    #     chi1 <- trait.names[j]
+    #   }
+    #   for (k in j:length(traits)) {
+    #     if (j != k) {
+    #       if (is.null(trait.names)) {
+    #         chi2 <- traits[k]
+    #       } else {
+    #         chi2 <- trait.names[k]
+    #       }
+    #       # .LOG("Genetic Correlation between ", chi1, " and ", chi2, ": ",
+    #       #      round(S_Stand[k, j], 4), " (", round(SE_Stand[k, j], 4), ")", file=log.file)
+    #       # .LOG("     ", file=log.file, print = FALSE)
+    #     }
+    #   }
+    # }
+  } else {
+    warning("Your genetic covariance matrix includes traits estimated to have a negative heritability.")
+    # .LOG("Your genetic covariance matrix includes traits estimated to have a negative heritability.", file=log.file, print = FALSE)
+    # .LOG("Genetic correlation results could not be computed due to negative heritability estimates.", file=log.file)
+  }
+
+  # end.time <- Sys.time()
+  #
+  # total.time <- difftime(time1 = end.time, time2 = begin.time, units = "sec")
+  # mins <- floor(floor(total.time) / 60)
+  # secs <- floor(total.time - mins * 60)
+
+  # .LOG("     ", file=log.file, print = FALSE)
+  # .LOG("LDSC finished running at ", end.time, file=log.file)
+  # .LOG("Running LDSC for all files took ", mins, " minutes and ", secs, " seconds", file=log.file)
+  # .LOG("     ", file=log.file, print = FALSE)
+
+  # flush(log.file)
+  # close(log.file)
+
+  ind <- which( upper.tri(S,diag=F) , arr.ind = TRUE )
+
+  rg_res <- tibble(trait1 = dimnames(S_Stand)[[2]][ind[,2]],
+              trait2 = dimnames(S_Stand)[[1]][ind[,1]],
+              rg = S_Stand[ind],
+              rg_se = SE_Stand[ind])
+
+  list(h2 = h2_res,
+       rg = rg_res,
+       raw = list(V = V, S = S, I = I, N = N.vec, m = m, V_Stand = V_Stand, S_Stand = S_Stand, SE_Stand = SE_Stand))
+
+  # if (stand) {
+  #   list(V = V, S = S, I = I, N = N.vec, m = m, V_Stand = V_Stand, S_Stand = S_Stand, SE_Stand = SE_Stand)
+  # } else {
+  #   list(V = V, S = S, I = I, N = N.vec, m = m)
+  # }
+>>>>>>> 9e0380f (ldsc_rg now works)
 
     return(merged)
   })
