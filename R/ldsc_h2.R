@@ -56,8 +56,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       vroom::vroom(col_types = vroom::cols())
   }
 
-  x$CM <- NULL
-  x$MAF <- NULL
+  x$CM <- x$MAF <- NULL
 
 
   # READ weights:
@@ -70,8 +69,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       vroom::vroom(col_types = vroom::cols())
   }
 
-  w$CM <- NULL
-  w$MAF <- NULL
+  w$CM <- w$MAF <- NULL
 
   colnames(w)[ncol(w)] <- "wLD"
 
