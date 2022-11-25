@@ -42,4 +42,5 @@ A \link[tibble:tibble-package]{tibble} containing heritability information. If \
 \donttest{
 ldsc_h2(sumstats_munged_example(dataframe = TRUE), ancestry = "EUR")
 }
+
 }
