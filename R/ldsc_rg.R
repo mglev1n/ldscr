@@ -248,11 +248,6 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
         trait2 <- names(munged_sumstats[k])
         cli::cli_progress_step("Estimating genetic covariance for for '{trait1}' and '{trait2}'")
 
-        # .LOG("     ", file=log.file, print = FALSE)
-
-        # chi2 <- traits[k]
-        # .LOG("Calculating genetic covariance [", s, "/", n.V, "] for traits: ", chi1, " and ", chi2, file=log.file)
-
         # Reuse the data read in for heritability
         y2 <- all_y[[k]]
         y <- merge(y1, y2[, c("SNP", "N", "Z", "A1")], by = "SNP", sort = FALSE)
@@ -262,8 +257,6 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
         y$chi2 <- y$Z.y^2
         merged <- na.omit(y)
         n.snps <- nrow(merged)
-
-        # .LOG(n.snps, " SNPs remain after merging ", chi1, " and ", chi2, " summary statistics", file=log.file)
 
         ## ADD INTERCEPT:
         merged$intercept <- 1
@@ -287,21 +280,12 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
         ## Perform analysis:
         covariance_res <- perform_analysis(n.blocks, n.snps, weighted.LD, weighted.chi, N.bar, m)
 
-        # V.hold[, s] <- pseudo.values[, 1]
-        # N.vec[1, s] <- N.bar
-
         V.hold[, s] <- covariance_res$pseudo.values
         N.vec[1, s] <- covariance_res$N.bar
 
         cov[k, j] <- cov[j, k] <- covariance_res$reg.tot
         I[k, j] <- I[j, k] <- covariance_res$intercept
 
-        # .LOG("Results for genetic covariance between: ", chi1, " and ", chi2, file=log.file)
-        # .LOG("Mean Z*Z: ", round(mean(merged$ZZ), 4), file=log.file)
-        # .LOG("Cross trait Intercept: ", round(intercept, 4), " (", round(intercept.se, 4), ")", file=log.file)
-        # .LOG("Total Observed Scale Genetic Covariance (g_cov): ", round(reg.tot, 4), " (", round(tot.se, 4), ")", file=log.file)
-        # .LOG("g_cov Z: ", format(reg.tot / tot.se, digits = 3), file=log.file)
-        # .LOG("g_cov P-value: ", format(2 * pnorm(abs(reg.tot / tot.se), lower.tail = FALSE), digits = 5), file=log.file)
       }
 
       ### Total count
@@ -335,31 +319,8 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     SE <- matrix(0, r, r)
     SE[lower.tri(SE, diag = TRUE)] <- sqrt(diag(V))
 
-    # for (j in 1:n.traits) {
-    #   if (is.null(trait.names)) {
-    #     chi1 <- traits[j]
-    #   } else {
-    #     chi1 <- trait.names[j]
-    #   }
-    #   for (k in j:length(traits)) {
-    #     if (j == k) {
-    #       # .LOG("     ", file=log.file, print = FALSE)
-    #       # .LOG("Liability scale results for: ", chi1, file=log.file)
-    #       # .LOG("Total Liability Scale h2: ", round(S[j, j], 4), " (", round(SE[j, j], 4), ")", file=log.file)
-    #     }
-    #
-    #     if (j != k) {
-    #       if (is.null(trait.names)) {
-    #         chi2 <- traits[k]
-    #       } else {
-    #         chi2 <- trait.names[k]
-    #       }
-    #       # .LOG("Total Liability Scale Genetic Covariance between ", chi1, " and ",
-    #       # chi2, ": ", round(S[k, j], 4), " (", round(SE[k, j], 4), ")", file=log.file)
-    #       # .LOG("     ", file=log.file, print = FALSE)
-    #     }
-    #   }
-    # }
+    colnames(SE) <- colnames(S)
+    rownames(SE) <- rownames(S)
   }
 
 
@@ -383,56 +344,22 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     SE_Stand <- matrix(0, r, r)
     SE_Stand[lower.tri(SE_Stand, diag = TRUE)] <- sqrt(diag(V_Stand))
 
+    colnames(SE_Stand) <- colnames(S)
+    rownames(SE_Stand) <- rownames(S)
 
-    # .LOG(c("     ", "     "), file=log.file, print = FALSE)
-    # .LOG("Genetic Correlation Results", file=log.file)
-
-    # for (j in 1:n.traits) {
-    #   if (is.null(trait.names)) {
-    #     chi1 <- traits[j]
-    #   } else {
-    #     chi1 <- trait.names[j]
-    #   }
-    #   for (k in j:length(traits)) {
-    #     if (j != k) {
-    #       if (is.null(trait.names)) {
-    #         chi2 <- traits[k]
-    #       } else {
-    #         chi2 <- trait.names[k]
-    #       }
-    #       # .LOG("Genetic Correlation between ", chi1, " and ", chi2, ": ",
-    #       #      round(S_Stand[k, j], 4), " (", round(SE_Stand[k, j], 4), ")", file=log.file)
-    #       # .LOG("     ", file=log.file, print = FALSE)
-    #     }
-    #   }
-    # }
   } else {
     cli::cli_alert_warning("Your genetic covariance matrix includes traits estimated to have a negative heritability.")
-    # .LOG("Your genetic covariance matrix includes traits estimated to have a negative heritability.", file=log.file, print = FALSE)
-    # .LOG("Genetic correlation results could not be computed due to negative heritability estimates.", file=log.file)
   }
 
-  # end.time <- Sys.time()
-  #
-  # total.time <- difftime(time1 = end.time, time2 = begin.time, units = "sec")
-  # mins <- floor(floor(total.time) / 60)
-  # secs <- floor(total.time - mins * 60)
 
-  # .LOG("     ", file=log.file, print = FALSE)
-  # .LOG("LDSC finished running at ", end.time, file=log.file)
-  # .LOG("Running LDSC for all files took ", mins, " minutes and ", secs, " seconds", file=log.file)
-  # .LOG("     ", file=log.file, print = FALSE)
-
-  # flush(log.file)
-  # close(log.file)
-
-  ind <- which(upper.tri(S, diag = F), arr.ind = TRUE)
+  ind <- which(lower.tri(S, diag = F), arr.ind = TRUE)
 
   rg_res <- tibble(
     trait1 = dimnames(S_Stand)[[2]][ind[, 2]],
     trait2 = dimnames(S_Stand)[[1]][ind[, 1]],
     rg = S_Stand[ind],
-    rg_se = SE_Stand[ind]
+    rg_se = SE_Stand[ind],
+    rg_p = 2*pnorm(abs(rg/rg_se), lower.tail = FALSE)
   )
 
   return(
