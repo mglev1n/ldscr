@@ -6,7 +6,7 @@
 #'
 #'
 #' @param munged_sumstats Either a dataframe, or a path to a file containing munged summary statistics. Must contain at least columns named `SNP` (rsid), `A1` (effect allele), `A2` (non-effect allele), `N` (total sample size) and `Z` (Z-score)
-#' @param ancestry (character) One of `AFR`, `AMR`, `CSA`, `EAS`, `EUR`, or `MID`, which will utilize the appropriate built-in `ld` and `wld` files from Pan-UK Biobank. If empty or `NULL`, the user must specify paths to `ld` and `wld` files.
+#' @param ancestry (character) One of "AFR", "AMR", "CSA", "EAS", "EUR", or "MID", which will utilize the appropriate built-in `ld` and `wld` files from Pan-UK Biobank. If empty or `NULL`, the user must specify paths to `ld` and `wld` files.
 #' @param sample_prev (numeric) For binary traits, this should be the prevalence of cases in the current sample, used for conversion from observed heritability to liability-scale heritability. The default is `NA`, which is appropriate for quantitative traits or estimating heritability on the observed scale.
 #' @param population_prev (numeric) For binary traits, this should be the population prevalence of the trait, used for conversion from observed heritability to liability-scale heritability. The default is `NA`, which is appropriate for quantitative traits or estimating heritability on the observed scale.
 #' @param ld (character) Path to directory containing ld score files, ending in `*.l2.ldscore.gz`. Default is `NA`, which will utilize the built-in ld score files from Pan-UK Biobank for the ancestry specified in `ancestry`.
@@ -229,7 +229,7 @@ h2_liability <- function(h2, sample_prev, population_prev) {
 
 #' Paths to LD-score files from Pan-UKB
 #'
-#' @param ancestry One of `AFR`, `AMR`, `CSA`, `EAS`, `EUR`, or `MID`
+#' @param ancestry (character) One of "AFR", "AMR", "CSA", "EAS", "EUR", or "MID"
 #' @param ... arguments passed to `fs::dir_ls()`
 #'
 #' @return a list of paths
@@ -245,7 +245,7 @@ ldscore_files <- function(ancestry, ...) {
 #' Example munged dataframe
 #'
 #' @param dataframe (logical) If `TRUE` (default), return an example munged dataframe. If `FALSE`, return path to the file on disk.
-#' @param example (character) One of `BMI` or `LDL` which have been included as example traits.
+#' @param example (character) One of "BMI" or "LDL" which have been included as example traits.
 #' @return either a [tibble][tibble::tibble-package] containing a munged dataframe, or a path to the file on disk.
 #'
 #' @export

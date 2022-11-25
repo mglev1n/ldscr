@@ -7,7 +7,7 @@
 ldscore_files(ancestry, ...)
 }
 \arguments{
-\item{ancestry}{One of \code{AFR}, \code{AMR}, \code{CSA}, \code{EAS}, \code{EUR}, or \code{MID}}
+\item{ancestry}{(character) One of "AFR", "AMR", "CSA", "EAS", "EUR", or "MID"}
 
 \item{...}{arguments passed to \code{fs::dir_ls()}}
 }

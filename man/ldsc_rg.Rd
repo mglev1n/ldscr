@@ -18,7 +18,7 @@ ldsc_rg(
 \arguments{
 \item{munged_sumstats}{(list) A named list of dataframes, or paths to files containing munged summary statistics. Each set of munged summary statistics contain at least columns named \code{SNP} (rsid), \code{A1} (effect allele), \code{A2} (non-effect allele), \code{N} (total sample size) and \code{Z} (Z-score)}
 
-\item{ancestry}{(character) One of \code{AFR}, \code{AMR}, \code{CSA}, \code{EAS}, \code{EUR}, or \code{MID}, which will utilize the appropriate built-in \code{ld} and \code{wld} files from Pan-UK Biobank. If empty or \code{NULL}, the user must specify paths to \code{ld} and \code{wld} files.}
+\item{ancestry}{(character) One of "AFR", "AMR", "CSA", "EAS", "EUR", or "MID", which will utilize the appropriate built-in \code{ld} and \code{wld} files from Pan-UK Biobank. If empty or \code{NULL}, the user must specify paths to \code{ld} and \code{wld} files.}
 
 \item{sample_prev}{(list) A named list containing the prevalence of cases in the current sample, used for conversion from observed heritability to liability-scale heritability. The default is \code{NA}, which is appropriate for quantitative traits or estimating heritability on the observed scale.}
 
