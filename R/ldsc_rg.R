@@ -144,25 +144,6 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
     cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max} from '{.y}'; {nrow(merged)} SNPs remain"))
 
-<<<<<<< HEAD
-    cli::cli_progress_step("Merging '{.y}' with LD-score files")
-    merged <- dplyr::inner_join(sumstats_df, w %>% dplyr::select(SNP, wLD), by = "SNP") %>%
-      dplyr::inner_join(x, by = "SNP") %>%
-      dplyr::arrange(CHR, BP)
-
-    cli::cli_alert_info(glue::glue("{nrow(merged)}/{nrow(sumstats_df)} SNPs remain after merging '{.y}' with LD-score files"))
-
-    ## REMOVE SNPS with excess chi-square:
-    if (is.na(chisq_max)) {
-      chisq_max <- max(0.001 * max(merged$N), 80)
-    }
-    rm <- (merged$Z^2 > chisq_max)
-    merged <- merged[!rm, ]
-
-    cli::cli_alert_info(glue::glue("Removed {sum(rm)} SNPs with Chi^2 > {chisq_max} from '{.y}'"))
-
-=======
->>>>>>> 3528ac1 (Use dtplyr/data.table to speed up joining)
     return(merged)
   })
 
@@ -454,18 +435,11 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     rg_se = SE_Stand[ind]
   )
 
-<<<<<<< HEAD
-  list(
-    h2 = h2_res,
-    rg = rg_res,
-    raw = list(V = V, S = S, I = I, N = N.vec, m = m, V_Stand = V_Stand, S_Stand = S_Stand, SE_Stand = SE_Stand)
-=======
   return(
     list(
       h2 = h2_res,
       rg = rg_res,
       raw = list(V = V, S = S, I = I, N = N.vec, m = m, V_Stand = V_Stand, S_Stand = S_Stand, SE_Stand = SE_Stand)
     )
->>>>>>> 3528ac1 (Use dtplyr/data.table to speed up joining)
   )
 }
