@@ -103,6 +103,120 @@
 <li><p><code>raw</code> = A list of correlation/covariance matrices</p></li>
 </ul></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="fu">ldsc_rg</span><span class="op">(</span>munged_sumstats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"APOB"</span> <span class="op">=</span> <span class="fu"><a href="sumstats_munged_example.html">sumstats_munged_example</a></span><span class="op">(</span>example <span class="op">=</span> <span class="st">"APOB"</span><span class="op">)</span>, <span class="st">"LDL"</span> <span class="op">=</span> <span class="fu"><a href="sumstats_munged_example.html">sumstats_munged_example</a></span><span class="op">(</span>example <span class="op">=</span> <span class="st">"LDL"</span><span class="op">)</span><span class="op">)</span>, ancestry <span class="op">=</span> <span class="st">"EUR"</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using EUR reference from Pan-UKB</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> No sample prevalence data provided. Estimating heritabilities on the observed scale.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Using EUR reference from Pan-UKB</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Using EUR reference from Pan-UKB <span style="color: #B2B2B2;">[754ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading LD Scores</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading LD Scores <span style="color: #B2B2B2;">[348ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading weights</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading weights <span style="color: #B2B2B2;">[361ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading M</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading M <span style="color: #B2B2B2;">[24ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading summary statistics</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading summary statistics for 'APOB' from dataframe</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading summary statistics for 'APOB' from dataframe <span style="color: #B2B2B2;">[1.4s]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading summary statistics</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Merging 'APOB' with LD-score files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> 1087712/1089172 SNPs remain after merging 'APOB' with LD-score files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Merging 'APOB' with LD-score files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Removed 171 SNPs with Chi^2 &gt; 342.59 from 'APOB'; 1087541 SNPs remain</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Merging 'APOB' with LD-score files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Merging 'APOB' with LD-score files <span style="color: #B2B2B2;">[6.2s]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading summary statistics</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading summary statistics for 'LDL' from dataframe</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading summary statistics for 'LDL' from dataframe <span style="color: #B2B2B2;">[1.8s]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading summary statistics</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Merging 'LDL' with LD-score files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> 1087712/1089172 SNPs remain after merging 'LDL' with LD-score files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Merging 'LDL' with LD-score files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Removed 127 SNPs with Chi^2 &gt; 343.621 from 'LDL'; 1087585 SNPs remain</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Merging 'LDL' with LD-score files</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Merging 'LDL' with LD-score files <span style="color: #B2B2B2;">[5.7s]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Reading summary statistics</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Reading summary statistics <span style="color: #B2B2B2;">[15.1s]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Estimating heritability for 'APOB'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Estimating heritability for 'APOB' <span style="color: #B2B2B2;">[233ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Estimating genetic covariance for for 'APOB' and 'LDL'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Estimating genetic covariance for for 'APOB' and 'LDL' <span style="color: #B2B2B2;">[4.2s]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Estimating heritability for 'LDL'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Estimating heritability for 'LDL' <span style="color: #B2B2B2;">[234ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $h2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 11</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trait mean_chisq lambda_gc inter…¹ inter…² ratio ratio…³ h2_ob…⁴ h2_ob…⁵  h2_Z</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> APOB        1.72      1.32    1.13  0.039<span style="text-decoration: underline;">8</span> 0.173  0.055<span style="text-decoration: underline;">1</span>  0.085<span style="text-decoration: underline;">3</span> 0.009<span style="text-decoration: underline;">30</span>  9.18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> LDL         1.67      1.29    1.10  0.038<span style="text-decoration: underline;">2</span> 0.156  0.057<span style="text-decoration: underline;">1</span>  0.079<span style="text-decoration: underline;">2</span> 0.008<span style="text-decoration: underline;">65</span>  9.16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># … with 1 more variable: h2_p &lt;dbl&gt;, and abbreviated variable names</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ¹​intercept, ²​intercept_se, ³​ratio_se, ⁴​h2_observed, ⁵​h2_observed_se</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $rg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 5</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   trait1 trait2    rg rg_se     rg_p</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> APOB   LDL    0.936 0.102 5.88<span style="color: #949494;">e</span><span style="color: #BB0000;">-20</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $raw</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $raw$V</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>              [,1]         [,2]         [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 8.641845e-05 7.696781e-05 7.616337e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 7.696781e-05 7.077810e-05 7.169640e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 7.616337e-05 7.169640e-05 7.478091e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $raw$S</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            APOB        LDL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> APOB 0.08531389 0.07695010</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> LDL  0.07695010 0.07919108</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $raw$I</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          [,1]     [,2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 1.125266 1.047318</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 1.047318 1.104392</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $raw$N</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        [,1]     [,2]   [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 342590 343105.1 343621</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $raw$m</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 6805960</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $raw$V_Stand</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]       [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.01187318 0.01097593 0.01127327</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.01097593 0.01047618 0.01101471</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 0.01127327 0.01101471 0.01192445</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $raw$S_Stand</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           APOB       LDL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> APOB 1.0000000 0.9361839</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> LDL  0.9361839 1.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $raw$SE_Stand</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           APOB       LDL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> APOB 0.1089641 0.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> LDL  0.1023532 0.1091991</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
