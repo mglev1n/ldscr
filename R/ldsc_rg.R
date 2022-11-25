@@ -24,6 +24,11 @@
 #' @import dtplyr
 #' @import data.table
 #'
+#' @examples
+#' \donttest{
+#' ldsc_rg(munged_sumstats = list("APOB" = sumstats_munged_example(example = "APOB"), "LDL" = sumstats_munged_example(example = "LDL")), ancestry = "EUR")
+#' }
+#'
 
 ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev = NA, ld, wld, n_blocks = 200, chisq_max = NA) {
   # Check function arguments
