@@ -548,7 +548,8 @@ perform_analysis <- function(n.blocks, n.snps, weighted.LD, weighted.chi, N.bar,
       intercept = intercept,
       intercept.se = intercept.se,
       pseudo.values = pseudo.values[, 1],
-      N.bar = N.bar
+      N.bar = N.bar,
+      tot.se = tot.se
     )
   )
 }
