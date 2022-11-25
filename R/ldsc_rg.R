@@ -285,7 +285,6 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
         cov[k, j] <- cov[j, k] <- covariance_res$reg.tot
         I[k, j] <- I[j, k] <- covariance_res$intercept
-
       }
 
       ### Total count
@@ -346,7 +345,6 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
     colnames(SE_Stand) <- colnames(S)
     rownames(SE_Stand) <- rownames(S)
-
   } else {
     cli::cli_alert_warning("Your genetic covariance matrix includes traits estimated to have a negative heritability.")
   }
@@ -359,7 +357,7 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     trait2 = dimnames(S_Stand)[[1]][ind[, 1]],
     rg = S_Stand[ind],
     rg_se = SE_Stand[ind],
-    rg_p = 2*pnorm(abs(rg/rg_se), lower.tail = FALSE)
+    rg_p = 2 * pnorm(abs(rg / rg_se), lower.tail = FALSE)
   )
 
   return(
