@@ -28,7 +28,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' ldsc_rg(munged_sumstats = list("APOB" = sumstats_munged_example(example = "APOB"), "LDL" = sumstats_munged_example(example = "LDL")), ancestry = "EUR")
+#' # Estimate genetic correlations between "APOB" and "LDL"
+#' ldsc_res <- ldsc_rg(munged_sumstats = list("APOB" = sumstats_munged_example(example = "APOB"), "LDL" = sumstats_munged_example(example = "LDL")), ancestry = "EUR")
+#'
+#' # Plot heatmap of results
+#' autoplot(ldsc_res)
 #' }
 #'
 
