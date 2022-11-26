@@ -1,7 +1,6 @@
 #' Estimate heritability
 #'
 #' @description
-#'
 #' `ldsc_h2()` uses ldscore regression to estimate the heritability of a trait from GWAS summary statistics and reference LD information.
 #'
 #'
