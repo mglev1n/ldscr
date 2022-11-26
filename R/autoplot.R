@@ -1,9 +1,9 @@
-autoplot.ldscr_list <- function(object, ...){
+autoplot.ldscr_list <- function(object, ...) {
   result <- object$raw
 
   r <- nrow(result$S)
-  result$Pval_Stand <- 2*pnorm(abs(result$S_Stand/result$SE_Stand), lower.tail = FALSE)
-  result$Pval_Stand <- as.matrix(Matrix::forceSymmetric(result$Pval_Stand,uplo = "L"))
+  result$Pval_Stand <- 2 * pnorm(abs(result$S_Stand / result$SE_Stand), lower.tail = FALSE)
+  result$Pval_Stand <- as.matrix(Matrix::forceSymmetric(result$Pval_Stand, uplo = "L"))
   result$trait_names <- colnames(result$S_Stand)
   rownames(result$S_Stand) <- colnames(result$S_Stand)
   ldsc_res <- result
