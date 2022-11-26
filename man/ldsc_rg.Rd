@@ -44,7 +44,7 @@ A list of class \code{ldscr_list} containing heritablilty and genetic correlatio
 \code{ldsc_rg()} uses ldscore regression to estimate the pairwise genetic correlations between traits. The function relies on named lists of traits, sample prevalences, and populatin prevalences. The name of each trait should be consistent across each argument.
 }
 \details{
-This function estimates the pairwise genetic correlations between an arbitrary number of traits. The function also estimates heritability for each individual trait. There is a There is a \code{\link[ggplot2:autoplot]{ggplot2::autoplot()}} method for visualizing a heatmap of the results.
+This function estimates the pairwise genetic correlations between an arbitrary number of traits. The function also estimates heritability for each individual trait. There is a \code{\link[ggplot2:autoplot]{ggplot2::autoplot()}} method for visualizing a heatmap of the results.
 }
 \examples{
 \donttest{
