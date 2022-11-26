@@ -27,7 +27,7 @@
 #' @import data.table
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' ldsc_rg(munged_sumstats = list("APOB" = sumstats_munged_example(example = "APOB"), "LDL" = sumstats_munged_example(example = "LDL")), ancestry = "EUR")
 #' }
 #'

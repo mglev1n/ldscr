@@ -21,7 +21,7 @@
 #' @import data.table
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' ldsc_h2(sumstats_munged_example(example = "BMI", dataframe = TRUE), ancestry = "EUR")
 #' }
 #'
