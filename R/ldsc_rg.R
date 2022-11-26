@@ -2,7 +2,7 @@
 #'
 #' @description
 #'
-#' `ldsc_rg()` uses ldscore regression to estimate the pairwise genetic correlations between traits. The function relies on named lists of traits, sample prevalences, and populatin prevalences. The name of each trait should be consistent across each argument.
+#' `ldsc_rg()` uses ldscore regression to estimate the pairwise genetic correlations between traits. The function relies on named lists of traits, sample prevalences, and population prevalences. The name of each trait should be consistent across each argument.
 #'
 #' @details
 #' This function estimates the pairwise genetic correlations between an arbitrary number of traits. The function also estimates heritability for each individual trait. There is a [ggplot2::autoplot()] method for visualizing a heatmap of the results.
