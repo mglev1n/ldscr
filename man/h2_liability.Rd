@@ -14,7 +14,7 @@ h2_liability(h2, sample_prev, population_prev)
 \item{population_prev}{(numeric) Population prevalence of trait}
 }
 \value{
-A list containing liability-scale heritability, standard error, and p-value
+(numeric) Liability-scale heritability
 }
 \description{
 \code{h2_liability()} converts heritability estimates from the observed to liability scale.

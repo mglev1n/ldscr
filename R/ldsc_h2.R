@@ -167,7 +167,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 #' @param h2 (numeric) Estimate of observed-scale heritability
 #' @param sample_prev (numeric) Proportion of cases in the current sample
 #' @param population_prev (numeric) Population prevalence of trait
-#' @return A list containing liability-scale heritability, standard error, and p-value
+#' @return (numeric) Liability-scale heritability
 #' @export
 
 #' @examples
