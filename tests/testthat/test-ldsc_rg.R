@@ -7,7 +7,7 @@ test_that("ldsc_rg works with two traits", {
     ancestry = "EUR"
   )
 
-  expect_type(rg_res, "list")
+  expect_s3_class(rg_res, "ldscr_list")
   expect_s3_class(rg_res$rg, "data.frame")
 })
 

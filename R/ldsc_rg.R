@@ -4,6 +4,8 @@
 #'
 #' `ldsc_rg()` uses ldscore regression to estimate the pairwise genetic correlations between traits. The function relies on named lists of traits, sample prevalences, and populatin prevalences. The name of each trait should be consistent across each argument.
 #'
+#' @details
+#' This function estimates the pairwise genetic correlations between an arbitrary number of traits. The function also estimates heritability for each individual trait. There is a There is a [ggplot2::autoplot()] method for visualizing a heatmap of the results.
 #'
 #' @param munged_sumstats (list) A named list of dataframes, or paths to files containing munged summary statistics. Each set of munged summary statistics contain at least columns named `SNP` (rsid), `A1` (effect allele), `A2` (non-effect allele), `N` (total sample size) and `Z` (Z-score)
 #' @param ancestry (character) One of "AFR", "AMR", "CSA", "EAS", "EUR", or "MID", which will utilize the appropriate built-in `ld` and `wld` files from Pan-UK Biobank. If empty or `NULL`, the user must specify paths to `ld` and `wld` files.
@@ -14,7 +16,7 @@
 #' @param n_blocks (numeric) Number of blocks used to produce block jackknife standard errors. Default is `200`
 #' @param chisq_max (numeric) Maximum value of Z^2 for SNPs to be included in LD-score regression. Default is to set `chisq_max` to the maximum of 80 and N*0.001.
 #'
-#' @return A list of heritablilty and genetic correlation information
+#' @return A list of class `ldscr_list` containing heritablilty and genetic correlation information
 #'  - `h2` = [tibble][tibble::tibble-package] containing heritability information for each trait. If `sample_prev` and `population_prev` were provided, the heritability estimates will also be returned on the liability scale.
 #'  - `rg` = [tibble][tibble::tibble-package] containing pairwise genetic correlations information.
 #'  - `raw` = A list of correlation/covariance matrices
@@ -334,11 +336,15 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     rg_p = 2 * pnorm(abs(rg / rg_se), lower.tail = FALSE)
   )
 
+  output <- list(
+    h2 = h2_res,
+    rg = rg_res,
+    raw = list(V = V, S = S, I = I, N = N.vec, m = m, V_Stand = V_Stand, S_Stand = S_Stand, SE_Stand = SE_Stand)
+  )
+
+  class(output) <- c("ldscr_list", "list")
+
   return(
-    list(
-      h2 = h2_res,
-      rg = rg_res,
-      raw = list(V = V, S = S, I = I, N = N.vec, m = m, V_Stand = V_Stand, S_Stand = S_Stand, SE_Stand = SE_Stand)
-    )
+    output
   )
 }

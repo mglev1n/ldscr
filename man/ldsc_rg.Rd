@@ -33,7 +33,7 @@ ldsc_rg(
 \item{chisq_max}{(numeric) Maximum value of Z^2 for SNPs to be included in LD-score regression. Default is to set \code{chisq_max} to the maximum of 80 and N*0.001.}
 }
 \value{
-A list of heritablilty and genetic correlation information
+A list of class \code{ldscr_list} containing heritablilty and genetic correlation information
 \itemize{
 \item \code{h2} = \link[tibble:tibble-package]{tibble} containing heritability information for each trait. If \code{sample_prev} and \code{population_prev} were provided, the heritability estimates will also be returned on the liability scale.
 \item \code{rg} = \link[tibble:tibble-package]{tibble} containing pairwise genetic correlations information.
@@ -42,6 +42,9 @@ A list of heritablilty and genetic correlation information
 }
 \description{
 \code{ldsc_rg()} uses ldscore regression to estimate the pairwise genetic correlations between traits. The function relies on named lists of traits, sample prevalences, and populatin prevalences. The name of each trait should be consistent across each argument.
+}
+\details{
+This function estimates the pairwise genetic correlations between an arbitrary number of traits. The function also estimates heritability for each individual trait. There is a There is a \code{\link[ggplot2:autoplot]{ggplot2::autoplot()}} method for visualizing a heatmap of the results.
 }
 \examples{
 \donttest{
