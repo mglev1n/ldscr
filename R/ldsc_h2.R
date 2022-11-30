@@ -174,9 +174,9 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 #' h2_liability(0.28, 0.1, 0.05)
 #'
 h2_liability <- function(h2, sample_prev, population_prev) {
-  checkmate::assert_double(h2, lower = 0, upper = 1)
-  checkmate::assert_double(sample_prev, lower = 0, upper = 1)
-  checkmate::assert_double(population_prev, lower = 0, upper = 1)
+  checkmate::assert_numeric(h2, lower = 0, upper = 1)
+  checkmate::assert_numeric(sample_prev, lower = 0, upper = 1)
+  checkmate::assert_numeric(population_prev, lower = 0, upper = 1)
 
   # From equation 23 of https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3059431/ Estimating Missing Heritability for Disease from Genome-wide Association Studies
   K <- population_prev
