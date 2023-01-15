@@ -12,6 +12,7 @@
 #' @param wld (character) Path to directory containing weight files. Default is `NA`, which will utilize the built-in weight files from Pan-UK Biobank for the ancestry specified in `ancestry`.
 #' @param n_blocks (numeric) Number of blocks used to produce block jackknife standard errors. Default is `200`
 #' @param chisq_max (numeric) Maximum value of Z^2 for SNPs to be included in LD-score regression. Default is to set `chisq_max` to the maximum of 80 and N*0.001.
+#' @param chr_filter (numeric vector) Chromosomes to include in analysis. Separating even/odd chromosomes may be useful for exploratory/confirmatory factor analysis.
 #'
 #' @return A [tibble][tibble::tibble-package] containing heritability information. If `sample_prev` and `population_prev` were provided, the heritability estimate will also be returned on the liability scale.
 #' @export
@@ -24,7 +25,7 @@
 #' ldsc_h2(sumstats_munged_example(example = "BMI", dataframe = TRUE), ancestry = "EUR")
 #' }
 #'
-ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev = NA, ld, wld, n_blocks = 200, chisq_max = NA) {
+ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev = NA, ld, wld, n_blocks = 200, chisq_max = NA, chr_filter = seq(1, 22, 1)) {
   # Check function arguments
   if (missing(ancestry)) {
     cli::cli_progress_step("No ancestry specified, checking for user-specified `ld` and `wld`")
@@ -71,7 +72,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   sumstats_df <- read_sumstats(munged_sumstats)
 
   cli::cli_progress_step("Merging summary statistics with LD-score files")
-  merged <- merge_sumstats(sumstats_df, w, x)
+  merged <- merge_sumstats(sumstats_df, w, x, chr_filter = chr_filter)
 
   cli::cli_alert_info(glue::glue("{nrow(merged)}/{nrow(sumstats_df)} SNPs remain after merging with LD-score files"))
 

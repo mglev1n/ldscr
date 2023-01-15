@@ -12,7 +12,8 @@ ldsc_rg(
   ld,
   wld,
   n_blocks = 200,
-  chisq_max = NA
+  chisq_max = NA,
+  chr_filter = seq(1, 22, 1)
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ ldsc_rg(
 \item{n_blocks}{(numeric) Number of blocks used to produce block jackknife standard errors. Default is \code{200}}
 
 \item{chisq_max}{(numeric) Maximum value of Z^2 for SNPs to be included in LD-score regression. Default is to set \code{chisq_max} to the maximum of 80 and N*0.001.}
+
+\item{chr_filter}{(numeric vector) Chromosomes to include in analysis. Separating even/odd chromosomes may be useful for exploratory/confirmatory factor analysis.}
 }
 \value{
 A list of class \code{ldscr_list} containing heritablilty and genetic correlation information

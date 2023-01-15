@@ -22,6 +22,6 @@ test_that("merge_sumstats works on internal data", {
   x <- read_ld(ancestry = "EUR")
   w <- x %>% dplyr::mutate(wLD = L2)
   sumstats_df <- read_sumstats(sumstats_munged_example(example = "BMI", dataframe = TRUE))
-  sumstats_df <- merge_sumstats(sumstats_df, w, x)
+  sumstats_df <- merge_sumstats(sumstats_df, w, x, chr_filter = seq(2, 22, 2))
   expect_s3_class(sumstats_df, "data.frame")
 })

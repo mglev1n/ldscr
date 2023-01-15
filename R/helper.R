@@ -60,13 +60,14 @@ read_sumstats <- function(munged_sumstats, name) {
   }
 }
 
-merge_sumstats <- function(sumstats_df, w, x) {
+merge_sumstats <- function(sumstats_df, w, x, chr_filter) {
   merged <- sumstats_df %>%
     dtplyr::lazy_dt() %>%
     dplyr::select(SNP, N, Z, A1) %>%
     dplyr::inner_join(w[, c("SNP", "wLD")], by = c("SNP")) %>%
     dplyr::inner_join(x, by = c("SNP")) %>%
     dplyr::arrange(CHR, BP) %>%
+    dplyr::filter(CHR %in% chr_filter) %>%
     na.omit() %>%
     unique() %>%
     tibble::as_tibble()
