@@ -1,28 +1,31 @@
 # Read ld from either internal or external file
-read_ld <- function(ancestry, ld, rsid=F, build="hg19") {
 
-  if(rsid){
-    if (missing(ancestry)) {
-      x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
-        vroom::vroom(col_types = vroom::cols())
-    } else {
-      x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-        vroom::vroom(col_types = vroom::cols())
-    }
+read_ld <- function(ancestry, ld=NA, rsid=F, build="hg19") {
+
+  if (missing(ancestry)) {
+    x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>% vroom::vroom(col_types = vroom::cols())
   } else {
-    if (build=="hg19"){
-      x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz.norsid") %>%
-        vroom::vroom(col_types = vroom::cols())
+
+    if(rsid){
+      x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>% vroom::vroom(col_types = vroom::cols())
     } else {
-      x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz.norsid_hg38") %>%
-        vroom::vroom(col_types = vroom::cols())
+      if (build=="hg19"){
+        x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid") %>% vroom::vroom(col_types = vroom::cols())
+      } else if (build=="hg38"){
+        x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid_hg38") %>% vroom::vroom(col_types = vroom::cols())
+      } else {
+        print ("Only hg19/hg38 LDscore available")
+      }
+
     }
   }
 
   return(x)
+
 }
 
 # Read wld from either internal or external file
+
 read_wld <- function(ancestry, wld) {
 
   if(rsid){
