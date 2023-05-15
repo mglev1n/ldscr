@@ -25,7 +25,7 @@
 #' ldsc_h2(sumstats_munged_example(example = "BMI", dataframe = TRUE), ancestry = "EUR")
 #' }
 #'
-ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev = NA, ld, wld, n_blocks = 200, chisq_max = NA, chr_filter = seq(1, 22, 1)) {
+ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev = NA, ld, wld, rsid=T, build="hg19", n_blocks = 200, chisq_max = NA, chr_filter = seq(1, 22, 1)) {
   # Check function arguments
   if (missing(ancestry)) {
     cli::cli_progress_step("No ancestry specified, checking for user-specified `ld` and `wld`")
@@ -50,13 +50,13 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
   # READ LD SCORES:
   cli::cli_progress_step("Reading LD Scores")
-  x <- read_ld(ancestry, ld)
+  x <- read_ld(ancestry, ld, rsid, build)
   x$CM <- x$MAF <- NULL
 
 
   # READ weights:
   cli::cli_progress_step("Reading weights")
-  w <- read_wld(ancestry, wld)
+  w <- read_wld(ancestry, wld, rsid, build)
   w$CM <- w$MAF <- NULL
   colnames(w)[ncol(w)] <- "wLD"
 

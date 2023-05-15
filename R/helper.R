@@ -1,18 +1,21 @@
 # Read ld from either internal or external file
 
-read_ld <- function(ancestry, ld=NA, rsid=F, build="hg19") {
+read_ld <- function(ancestry, ld=NA, rsid=T, build="hg19") {
 
   if (missing(ancestry)) {
-    x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>% vroom::vroom(col_types = vroom::cols())
+    x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
+         vroom::vroom(col_types = vroom::cols())
   } else {
-
     if(rsid){
-      x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>% vroom::vroom(col_types = vroom::cols())
+      x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
+           vroom::vroom(col_types = vroom::cols())
     } else {
       if (build=="hg19"){
-        x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid") %>% vroom::vroom(col_types = vroom::cols())
+        x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid") %>%
+             vroom::vroom(col_types = vroom::cols())
       } else if (build=="hg38"){
-        x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid_hg38") %>% vroom::vroom(col_types = vroom::cols())
+        x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid_hg38") %>%
+             vroom::vroom(col_types = vroom::cols())
       } else {
         print ("Only hg19/hg38 LDscore available")
       }
@@ -26,23 +29,26 @@ read_ld <- function(ancestry, ld=NA, rsid=F, build="hg19") {
 
 # Read wld from either internal or external file
 
-read_wld <- function(ancestry, wld) {
+read_wld <- function(ancestry, wld, rsid=T, build="hg19") {
 
-  if(rsid){
-    if (missing(ancestry)) {
-      w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz") %>%
-        vroom::vroom(col_types = vroom::cols())
-    } else {
-      x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-        vroom::vroom(col_types = vroom::cols())
-    }
+  if (missing(ancestry)) {
+    w <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
+         vroom::vroom(col_types = vroom::cols())
   } else {
-    if (build=="hg19"){
-      w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz.norsid") %>%
-        vroom::vroom(col_types = vroom::cols())
+    if(rsid){
+      w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
+           vroom::vroom(col_types = vroom::cols())
     } else {
-      w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz.norsid_hg38") %>%
-        vroom::vroom(col_types = vroom::cols())
+      if (build=="hg19"){
+        w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid") %>%
+             vroom::vroom(col_types = vroom::cols())
+      } else if (build=="hg38"){
+        w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid_hg38") %>%
+             vroom::vroom(col_types = vroom::cols())
+      } else {
+        print ("Only hg19/hg38 LDscore available")
+      }
+
     }
   }
 
