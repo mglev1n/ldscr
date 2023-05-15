@@ -32,7 +32,7 @@ read_ld <- function(ancestry, ld=NA, rsid=T, build="hg19") {
 read_wld <- function(ancestry, wld, rsid=T, build="hg19") {
 
   if (missing(ancestry)) {
-    w <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
+    w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz") %>%
          vroom::vroom(col_types = vroom::cols())
   } else {
     if(rsid){
