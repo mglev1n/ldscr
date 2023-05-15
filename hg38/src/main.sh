@@ -67,3 +67,25 @@ fx EAS
 fx CSA
 fx MID
 
+############
+## Sample ##
+############
+
+join -t $'\t' \
+  <(zcat ../../inst/extdata/EUR/UKBB.EUR.l2.ldscore.gz \
+    | sed '1d' \
+    | awk '{print $1":"$3"\t"$2}' | sort -k 1,1) \
+  <(zcat ../../inst/extdata/EUR/UKBB.EUR.l2.ldscore.gz.norsid \
+    | sed '1d' \
+    | awk '{print $1":"$3"\t"$2}' | sort -k 1,1) \
+  | awk '{print $2"\t"$3}' > ../tmp/rsid_hg19.linker
+
+zcat ../../inst/extdata/BMI-sumstats-munged.txt.gz | sed '1d' | sort -k 1,1 \
+  | join -t $'\t' <(cat ../tmp/rsid_hg19.linker | sort -k 1,1) /dev/stdin \
+  | cut -f 2- \
+  | sort -V \
+  | sed '1s/^/SNP\tN\tZ\tA1\tA2\n/' \
+  | gzip -c > ../../inst/extdata/BMIhg19-sumstats-munged.txt.gz
+
+rm ../tmp/rsid_hg19.linker
+
