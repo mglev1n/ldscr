@@ -8,8 +8,9 @@ fx () {
 
   zcat ../../inst/extdata/${POP}/UKBB.${POP}.l2.ldscore.gz.norsid \
     | sed '1d' \
-    | awk -v OFS="\t" '{split($2,arr,":"); print arr[1],arr[2]-1,arr[2],arr[3],arr[4],$2}' \
-    > ../tmp/UKBB.${POP}.l2.ldscore.hg19.bed
+    | awk -v OFS="\t" '{split($2,arr,":");
+      print arr[1],arr[2]-1,arr[2],arr[3],arr[4],$2
+    }' > ../tmp/UKBB.${POP}.l2.ldscore.hg19.bed
 
   bedtools getfasta -tab -fi ~/publicdata/reference/Homo_sapiens_assembly19.fasta \
     -bed ../tmp/UKBB.${POP}.l2.ldscore.hg19.bed > ../tmp/UKBB.${POP}.l2.ldscore.hg19.ref
@@ -47,6 +48,7 @@ fx () {
     <(zcat ../../inst/extdata/${POP}/UKBB.${POP}.l2.ldscore.gz.norsid \
     | sed '1d' | awk -v OFS="\t" '{print $2,$4}' | sort -k 1,1) \
     | cut -f 2- \
+    | sort -V -S 12G -T . \
     | sed '1s/^/CHR\tSNP\tBP\tL2\n/' \
     | gzip -c > ../../inst/extdata/${POP}/UKBB.${POP}.l2.ldscore.gz.norsid_hg38
 
