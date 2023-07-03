@@ -115,6 +115,8 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   ## Perform analysis:
   analysis_res <- perform_analysis(n.blocks = n_blocks, n.snps, weighted.LD, weighted.chi, N.bar, m)
 
+  sprintf("N SNPs in merged file %s", nrow(merged))
+
   lambda.gc <- median(merged$chi1) / qchisq(0.5, df = 1)
   mean.Chi <- mean(merged$chi1)
   ratio <- (analysis_res$intercept - 1) / (mean.Chi - 1)
@@ -137,7 +139,8 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       h2_Z = analysis_res$reg.tot / analysis_res$tot.se,
       h2_p = 2 * pnorm(abs(h2_Z), lower.tail = FALSE),
       h2_liability = h2_lia,
-      h2_liability_se = h2_lia / h2_Z
+      h2_liability_se = h2_lia / h2_Z,
+      N_snp = nrow(merged)
     )
   } else {
     h2_res <- tibble(
@@ -150,7 +153,8 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
       h2_observed = analysis_res$reg.tot,
       h2_observed_se = analysis_res$tot.se,
       h2_Z = analysis_res$reg.tot / analysis_res$tot.se,
-      h2_p = 2 * pnorm(abs(h2_Z), lower.tail = FALSE)
+      h2_p = 2 * pnorm(abs(h2_Z), lower.tail = FALSE),
+      N_snp = nrow(merged)
     )
   }
 
