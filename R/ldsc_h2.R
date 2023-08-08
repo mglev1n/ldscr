@@ -32,7 +32,7 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     checkmate::assert_directory_exists(ld)
     checkmate::assert_directory_exists(wld)
   } else {
-    checkmate::assert_choice(ancestry, c("AFR", "AMR", "CSA", "EAS", "EUR", "MID"), null.ok = FALSE)
+    checkmate::assert_choice(ancestry, c("AFR", "AMR", "CSA", "EAS", "EUR", "MID", "KGP_AFR", "KGP_AMR", "KGP_EAS", "KGP_EUR", "KGP_SAS"), null.ok = FALSE)
     cli::cli_progress_step("Using {ancestry} reference from Pan-UKB")
   }
 
