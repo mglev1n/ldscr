@@ -35,7 +35,7 @@ ldsc_h2 <- function(
     rsid=T,
     build="hg19",
     n_blocks = 200,
-    return_munged = F,
+    return_merged = F,
     chisq_max = NA,
     chr_filter = seq(1, 22, 1)
   ) {
@@ -171,12 +171,12 @@ ldsc_h2 <- function(
       h2_observed_se  = round(analysis_res$tot.se, precision),
       h2_Z            = round(analysis_res$reg.tot / analysis_res$tot.se, precision),
       h2_p            = round(2 * pnorm(abs(h2_Z), lower.tail = FALSE), precision),
-      N_snp           = round(nrow(merged), precision)
+      N_snp           = nrow(merged)
     )
 
   }
 
-  if(return_munged){
+  if(return_merged){
     h2_res = list(h2_res, merged)
   }
 
@@ -215,6 +215,4 @@ h2_liability <- function(h2, sample_prev, population_prev) {
 
   return(h2_liab)
 }
-
-
 
