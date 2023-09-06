@@ -25,7 +25,21 @@
 #' ldsc_h2(sumstats_munged_example(example = "BMI", dataframe = TRUE), ancestry = "EUR")
 #' }
 #'
-ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev = NA, ld, wld, rsid=T, build="hg19", n_blocks = 200, chisq_max = NA, chr_filter = seq(1, 22, 1)) {
+ldsc_h2 <- function(
+    munged_sumstats,
+    ancestry,
+    sample_prev = NA,
+    population_prev = NA,
+    ld,
+    wld,
+    rsid=T,
+    build="hg19",
+    n_blocks = 200,
+    return_munged = F,
+    chisq_max = NA,
+    chr_filter = seq(1, 22, 1)
+  ) {
+
   # Check function arguments
   if (missing(ancestry)) {
     cli::cli_progress_step("No ancestry specified, checking for user-specified `ld` and `wld`")
@@ -47,12 +61,10 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   Liab.S <- rep(1, n.traits)
   I <- matrix(NA, nrow = n.traits, ncol = n.traits)
 
-
   # READ LD SCORES:
   cli::cli_progress_step("Reading LD Scores")
   x <- read_ld(ancestry, ld, rsid, build)
   x$CM <- x$MAF <- NULL
-
 
   # READ weights:
   cli::cli_progress_step("Reading weights")
@@ -111,54 +123,65 @@ ldsc_h2 <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   weighted.LD <- as.matrix(cbind(merged$L2, merged$intercept) * merged$weights)
   weighted.chi <- as.matrix(merged$chi1 * merged$weights)
 
-
   ## Perform analysis:
   analysis_res <- perform_analysis(n.blocks = n_blocks, n.snps, weighted.LD, weighted.chi, N.bar, m)
 
   sprintf("N SNPs in merged file %s", nrow(merged))
 
   lambda.gc <- median(merged$chi1) / qchisq(0.5, df = 1)
-  mean.Chi <- mean(merged$chi1)
-  ratio <- (analysis_res$intercept - 1) / (mean.Chi - 1)
-  ratio.se <- analysis_res$intercept.se / (mean.Chi - 1)
+  mean.Chi  <- mean(merged$chi1)
+  ratio     <- (analysis_res$intercept - 1) / (mean.Chi - 1)
+  ratio.se  <- analysis_res$intercept.se / (mean.Chi - 1)
+
+  precision <- 6
 
   if (is.na(population_prev) == F & is.na(sample_prev) == F) {
+
     # conversion.factor <- (population_prev^2 * (1 - population_prev)^2) / (sample_prev * (1 - sample_prev) * dnorm(qnorm(1 - population_prev))^2)
     # Liab.S <- conversion.factor
+
     h2_lia <- h2_liability(h2 = analysis_res$reg.tot, sample_prev, population_prev)
 
     h2_res <- tibble(
-      mean_chisq = mean.Chi,
-      lambda_gc = lambda.gc,
-      intercept = analysis_res$intercept,
-      intercept_se = analysis_res$intercept.se,
-      ratio = ratio,
-      ratio_se = ratio.se,
-      h2_observed = analysis_res$reg.tot,
-      h2_observed_se = analysis_res$tot.se,
-      h2_Z = analysis_res$reg.tot / analysis_res$tot.se,
-      h2_p = 2 * pnorm(abs(h2_Z), lower.tail = FALSE),
-      h2_liability = h2_lia,
-      h2_liability_se = h2_lia / h2_Z,
-      N_snp = nrow(merged)
+      mean_chisq      = round(mean.Chi, precision),
+      lambda_gc       = round(lambda.gc, precision),
+      intercept       = round(analysis_res$intercept, precision),
+      intercept_se    = round(analysis_res$intercept.se, precision),
+      ratio           = round(ratio, precision),
+      ratio_se        = round(ratio.se, precision),
+      h2_observed     = round(analysis_res$reg.tot, precision),
+      h2_observed_se  = round(analysis_res$tot.se, precition),
+      h2_Z            = round(analysis_res$reg.tot / analysis_res$tot.se, precision),
+      h2_p            = round(2 * pnorm(abs(h2_Z), lower.tail = FALSE), precision),
+      h2_liability    = round(h2_lia, precision),
+      h2_liability_se = round(h2_lia / h2_Z, precision),
+      N_snp           = nrow(merged)
     )
+
   } else {
+
     h2_res <- tibble(
-      mean_chisq = mean.Chi,
-      lambda_gc = lambda.gc,
-      intercept = analysis_res$intercept,
-      intercept_se = analysis_res$intercept.se,
-      ratio = ratio,
-      ratio_se = ratio.se,
-      h2_observed = analysis_res$reg.tot,
-      h2_observed_se = analysis_res$tot.se,
-      h2_Z = analysis_res$reg.tot / analysis_res$tot.se,
-      h2_p = 2 * pnorm(abs(h2_Z), lower.tail = FALSE),
-      N_snp = nrow(merged)
+      mean_chisq      = round(mean.Chi, precision),
+      lambda_gc       = round(lambda.gc, precision),
+      intercept       = round(analysis_res$intercept, precision),
+      intercept_se    = round(analysis_res$intercept.se, precision),
+      ratio           = round(ratio, precision),
+      ratio_se        = round(ratio.se, precision),
+      h2_observed     = round(analysis_res$reg.tot, precision),
+      h2_observed_se  = round(analysis_res$tot.se, precision),
+      h2_Z            = round(analysis_res$reg.tot / analysis_res$tot.se, precision),
+      h2_p            = round(2 * pnorm(abs(h2_Z), lower.tail = FALSE), precision),
+      N_snp           = round(nrow(merged), precision)
     )
+
+  }
+
+  if(return_munged){
+    h2_res = list(h2_res, merged)
   }
 
   return(h2_res)
+
 }
 
 
