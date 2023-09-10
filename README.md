@@ -27,7 +27,6 @@ You can install the development version of ldscr from
 # install.packages("devtools")
 
 devtools::install_github("mglev1n/ldscr")
-devtools::install_github("skoyamamd/ldscr")
 ```
 
 ## Usage
