@@ -60,10 +60,10 @@ read_wld <- function(ancestry, wld, rsid=T, build="hg19") {
 read_m <- function(ancestry, ld) {
   if (missing(ancestry)) {
     m <- fs::dir_ls(ld, glob = "*.l2.M_5_50") %>%
-      vroom::vroom(col_types = vroom::cols(), col_names = FALSE, delim = "\t")
+      data.table::fread(header = FALSE, sep = "\t")
   } else {
     m <- ldscore_files(ancestry, glob = "*.l2.M_5_50") %>%
-      vroom::vroom(col_types = vroom::cols(), col_names = FALSE, delim = "\t")
+      data.table::fread(header = FALSE, sep = "\t")
   }
   return(m)
 }
@@ -75,7 +75,7 @@ read_sumstats <- function(munged_sumstats, name) {
   if (missing(name)) {
     if (is.character(munged_sumstats)) {
       cli::cli_progress_step("Reading summary statistics from {munged_sumstats}")
-      sumstats_df <- vroom::vroom(munged_sumstats, col_types = vroom::cols())
+      sumstats_df <- data.table::fread(munged_sumstats)
     } else {
       cli::cli_progress_step("Reading summary statistics from dataframe")
       sumstats_df <- munged_sumstats
@@ -83,7 +83,7 @@ read_sumstats <- function(munged_sumstats, name) {
   } else {
     if (is.character(munged_sumstats)) {
       cli::cli_progress_step("Reading summary statistics for '{name}' from {munged_sumstats}")
-      sumstats_df <- vroom::vroom(.x, col_types = vroom::cols())
+      sumstats_df <- data.table::fread(.x)
     } else {
       cli::cli_progress_step("Reading summary statistics for '{name}' from dataframe")
       sumstats_df <- .x
