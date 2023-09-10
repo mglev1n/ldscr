@@ -4,18 +4,18 @@ read_ld <- function(ancestry, ld=NA, rsid=T, build="hg19") {
 
   if (missing(ancestry)) {
     x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
-         vroom::vroom(col_types = vroom::cols())
+         data.table::fread()
   } else {
     if(rsid){
       x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-           vroom::vroom(col_types = vroom::cols())
+           data.table::fread()
     } else {
       if (build=="hg19"){
         x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid") %>%
-             vroom::vroom(col_types = vroom::cols())
+             data.table::fread()
       } else if (build=="hg38"){
         x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid_hg38") %>%
-             vroom::vroom(col_types = vroom::cols())
+             data.table::fread()
       } else {
         print ("Only hg19/hg38 LDscore available")
       }
@@ -33,18 +33,18 @@ read_wld <- function(ancestry, wld, rsid=T, build="hg19") {
 
   if (missing(ancestry)) {
     w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz") %>%
-         vroom::vroom(col_types = vroom::cols())
+         data.table::fread()
   } else {
     if(rsid){
       w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-           vroom::vroom(col_types = vroom::cols())
+           data.table::fread()
     } else {
       if (build=="hg19"){
         w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid") %>%
-             vroom::vroom(col_types = vroom::cols())
+             data.table::fread()
       } else if (build=="hg38"){
         w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid_hg38") %>%
-             vroom::vroom(col_types = vroom::cols())
+             data.table::fread()
       } else {
         print ("Only hg19/hg38 LDscore available")
       }
