@@ -11,7 +11,10 @@ ldsc_h2(
   population_prev = NA,
   ld,
   wld,
+  rsid = T,
+  build = "hg19",
   n_blocks = 200,
+  return_merged = F,
   chisq_max = NA,
   chr_filter = seq(1, 22, 1)
 )
