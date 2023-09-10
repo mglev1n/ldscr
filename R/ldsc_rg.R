@@ -102,7 +102,7 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   all_y <- purrr::imap(munged_sumstats, ~ {
     if (is.character(.x)) {
       cli::cli_progress_step("Reading summary statistics for '{.y}' from {.x}")
-      sumstats_df <- vroom::vroom(.x, col_types = vroom::cols())
+      sumstats_df <- data.table::fread(.x)
     } else {
       cli::cli_progress_step("Reading summary statistics for '{.y}' from dataframe")
       sumstats_df <- .x
