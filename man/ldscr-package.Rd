@@ -17,4 +17,13 @@ Useful links:
 }
 
 }
+\author{
+\strong{Maintainer}: Michael Levin \email{mglev1n@gmail.com} (\href{https://orcid.org/0000-0002-9937-9932}{ORCID})
+
+Authors:
+\itemize{
+  \item Satoshi Koyama \email{skoyama@broadinstitute.org}
+}
+
+}
 \keyword{internal}
