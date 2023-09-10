@@ -3,18 +3,18 @@
 read_ld <- function(ancestry, ld = NA, rsid = T, build = "hg19") {
   if (missing(ancestry)) {
     x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
-      data.table::fread()
+      data.table::fread() %>% tibble::as_tibble()
   } else {
     if (rsid) {
       x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-        data.table::fread()
+        data.table::fread() %>% tibble::as_tibble()
     } else {
       if (build == "hg19") {
         x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid") %>%
-          data.table::fread()
+          data.table::fread() %>% tibble::as_tibble()
       } else if (build == "hg38") {
         x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid_hg38") %>%
-          data.table::fread()
+          data.table::fread() %>% tibble::as_tibble()
       } else {
         print("Only hg19/hg38 LDscore available")
       }
@@ -29,18 +29,18 @@ read_ld <- function(ancestry, ld = NA, rsid = T, build = "hg19") {
 read_wld <- function(ancestry, wld, rsid = T, build = "hg19") {
   if (missing(ancestry)) {
     w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz") %>%
-      data.table::fread()
+      data.table::fread() %>% tibble::as_tibble()
   } else {
     if (rsid) {
       w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-        data.table::fread()
+        data.table::fread() %>% tibble::as_tibble()
     } else {
       if (build == "hg19") {
         w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid") %>%
-          data.table::fread()
+          data.table::fread() %>% tibble::as_tibble()
       } else if (build == "hg38") {
         w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid_hg38") %>%
-          data.table::fread()
+          data.table::fread() %>% tibble::as_tibble()
       } else {
         print("Only hg19/hg38 LDscore available")
       }
@@ -54,10 +54,10 @@ read_wld <- function(ancestry, wld, rsid = T, build = "hg19") {
 read_m <- function(ancestry, ld) {
   if (missing(ancestry)) {
     m <- fs::dir_ls(ld, glob = "*.l2.M_5_50") %>%
-      data.table::fread(header = FALSE, sep = "\t")
+      data.table::fread(header = FALSE, sep = "\t") %>% tibble::as_tibble()
   } else {
     m <- ldscore_files(ancestry, glob = "*.l2.M_5_50") %>%
-      data.table::fread(header = FALSE, sep = "\t")
+      data.table::fread(header = FALSE, sep = "\t") %>% tibble::as_tibble()
   }
   return(m)
 }
@@ -69,7 +69,7 @@ read_sumstats <- function(munged_sumstats, name) {
   if (missing(name)) {
     if (is.character(munged_sumstats)) {
       cli::cli_progress_step("Reading summary statistics from {munged_sumstats}")
-      sumstats_df <- data.table::fread(munged_sumstats)
+      sumstats_df <- data.table::fread(munged_sumstats) %>% tibble::as_tibble()
     } else {
       cli::cli_progress_step("Reading summary statistics from dataframe")
       sumstats_df <- munged_sumstats
@@ -77,7 +77,7 @@ read_sumstats <- function(munged_sumstats, name) {
   } else {
     if (is.character(munged_sumstats)) {
       cli::cli_progress_step("Reading summary statistics for '{name}' from {munged_sumstats}")
-      sumstats_df <- data.table::fread(.x)
+      sumstats_df <- data.table::fread(.x) %>% tibble::as_tibble()
     } else {
       cli::cli_progress_step("Reading summary statistics for '{name}' from dataframe")
       sumstats_df <- .x

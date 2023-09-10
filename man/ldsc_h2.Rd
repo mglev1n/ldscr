@@ -32,7 +32,13 @@ ldsc_h2(
 
 \item{wld}{(character) Path to directory containing weight files. Default is \code{NA}, which will utilize the built-in weight files from Pan-UK Biobank for the ancestry specified in \code{ancestry}.}
 
+\item{rsid}{(logical) Read LD files including LD information ('TRUE') or without RSID information ('FALSE')}
+
+\item{build}{(character) Genome build (\code{hg19} or \code{hg38}) description}
+
 \item{n_blocks}{(numeric) Number of blocks used to produce block jackknife standard errors. Default is \code{200}}
+
+\item{return_merged}{(logical) Return munged dataframe}
 
 \item{chisq_max}{(numeric) Maximum value of Z^2 for SNPs to be included in LD-score regression. Default is to set \code{chisq_max} to the maximum of 80 and N*0.001.}
 

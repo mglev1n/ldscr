@@ -13,7 +13,9 @@
 #' @param n_blocks (numeric) Number of blocks used to produce block jackknife standard errors. Default is `200`
 #' @param chisq_max (numeric) Maximum value of Z^2 for SNPs to be included in LD-score regression. Default is to set `chisq_max` to the maximum of 80 and N*0.001.
 #' @param chr_filter (numeric vector) Chromosomes to include in analysis. Separating even/odd chromosomes may be useful for exploratory/confirmatory factor analysis.
-#'
+#' @param build (character) Genome build (`hg19` or `hg38`) description
+#' @param rsid (logical) Read LD files including LD information ('TRUE') or without RSID information ('FALSE')
+#' @param return_merged (logical) Return munged dataframe
 #' @return A [tibble][tibble::tibble-package] containing heritability information. If `sample_prev` and `population_prev` were provided, the heritability estimate will also be returned on the liability scale.
 #' @export
 #'
@@ -147,7 +149,7 @@ ldsc_h2 <- function(
       ratio           = round(ratio, precision),
       ratio_se        = round(ratio.se, precision),
       h2_observed     = round(analysis_res$reg.tot, precision),
-      h2_observed_se  = round(analysis_res$tot.se, precition),
+      h2_observed_se  = round(analysis_res$tot.se, precision),
       h2_Z            = round(analysis_res$reg.tot / analysis_res$tot.se, precision),
       h2_p            = round(2 * pnorm(abs(h2_Z), lower.tail = FALSE), precision),
       h2_liability    = round(h2_lia, precision),

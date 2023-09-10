@@ -29,6 +29,7 @@ Imports:
     magrittr,
     Matrix,
     purrr,
+    R.utils,
     stats,
     stringr,
     tibble,
