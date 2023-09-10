@@ -36,7 +36,6 @@
 #' autoplot(ldsc_res)
 #' }
 #'
-
 ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev = NA, ld, wld, n_blocks = 200, chisq_max = NA, chr_filter = seq(1, 22, 1)) {
   # Check function arguments
   if (missing(ancestry)) {

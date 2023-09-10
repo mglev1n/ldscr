@@ -32,14 +32,12 @@ ldsc_h2 <- function(
     population_prev = NA,
     ld,
     wld,
-    rsid=T,
-    build="hg19",
+    rsid = T,
+    build = "hg19",
     n_blocks = 200,
     return_merged = F,
     chisq_max = NA,
-    chr_filter = seq(1, 22, 1)
-  ) {
-
+    chr_filter = seq(1, 22, 1)) {
   # Check function arguments
   if (missing(ancestry)) {
     cli::cli_progress_step("No ancestry specified, checking for user-specified `ld` and `wld`")
@@ -129,14 +127,13 @@ ldsc_h2 <- function(
   sprintf("N SNPs in merged file %s", nrow(merged))
 
   lambda.gc <- median(merged$chi1) / qchisq(0.5, df = 1)
-  mean.Chi  <- mean(merged$chi1)
-  ratio     <- (analysis_res$intercept - 1) / (mean.Chi - 1)
-  ratio.se  <- analysis_res$intercept.se / (mean.Chi - 1)
+  mean.Chi <- mean(merged$chi1)
+  ratio <- (analysis_res$intercept - 1) / (mean.Chi - 1)
+  ratio.se <- analysis_res$intercept.se / (mean.Chi - 1)
 
   precision <- 6
 
   if (is.na(population_prev) == F & is.na(sample_prev) == F) {
-
     # conversion.factor <- (population_prev^2 * (1 - population_prev)^2) / (sample_prev * (1 - sample_prev) * dnorm(qnorm(1 - population_prev))^2)
     # Liab.S <- conversion.factor
 
@@ -157,9 +154,7 @@ ldsc_h2 <- function(
       h2_liability_se = round(h2_lia / h2_Z, precision),
       N_snp           = nrow(merged)
     )
-
   } else {
-
     h2_res <- tibble(
       mean_chisq      = round(mean.Chi, precision),
       lambda_gc       = round(lambda.gc, precision),
@@ -173,15 +168,13 @@ ldsc_h2 <- function(
       h2_p            = round(2 * pnorm(abs(h2_Z), lower.tail = FALSE), precision),
       N_snp           = nrow(merged)
     )
-
   }
 
-  if(return_merged){
-    h2_res = list(h2_res, merged)
+  if (return_merged) {
+    h2_res <- list(h2_res, merged)
   }
 
   return(h2_res)
-
 }
 
 
@@ -215,4 +208,3 @@ h2_liability <- function(h2, sample_prev, population_prev) {
 
   return(h2_liab)
 }
-

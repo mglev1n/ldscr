@@ -1,59 +1,53 @@
 # Read ld from either internal or external file
 
-read_ld <- function(ancestry, ld=NA, rsid=T, build="hg19") {
-
+read_ld <- function(ancestry, ld = NA, rsid = T, build = "hg19") {
   if (missing(ancestry)) {
     x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
-         data.table::fread()
+      data.table::fread()
   } else {
-    if(rsid){
+    if (rsid) {
       x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-           data.table::fread()
+        data.table::fread()
     } else {
-      if (build=="hg19"){
+      if (build == "hg19") {
         x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid") %>%
-             data.table::fread()
-      } else if (build=="hg38"){
+          data.table::fread()
+      } else if (build == "hg38") {
         x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid_hg38") %>%
-             data.table::fread()
+          data.table::fread()
       } else {
-        print ("Only hg19/hg38 LDscore available")
+        print("Only hg19/hg38 LDscore available")
       }
-
     }
   }
 
   return(x)
-
 }
 
 # Read wld from either internal or external file
 
-read_wld <- function(ancestry, wld, rsid=T, build="hg19") {
-
+read_wld <- function(ancestry, wld, rsid = T, build = "hg19") {
   if (missing(ancestry)) {
     w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz") %>%
-         data.table::fread()
+      data.table::fread()
   } else {
-    if(rsid){
+    if (rsid) {
       w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-           data.table::fread()
+        data.table::fread()
     } else {
-      if (build=="hg19"){
+      if (build == "hg19") {
         w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid") %>%
-             data.table::fread()
-      } else if (build=="hg38"){
+          data.table::fread()
+      } else if (build == "hg38") {
         w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid_hg38") %>%
-             data.table::fread()
+          data.table::fread()
       } else {
-        print ("Only hg19/hg38 LDscore available")
+        print("Only hg19/hg38 LDscore available")
       }
-
     }
   }
 
   return(w)
-
 }
 
 # Read M from either internal or external file
