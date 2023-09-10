@@ -4,6 +4,7 @@ Version: 0.1.0
 Authors@R: 
     person("Michael", "Levin", , "mglev1n@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9937-9932"))
+    person("Satoshi", "Koyama", , "skoyama@broadinstitute.org", role = c("aut"))
 Description: This package implements LD score regression in R.
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
