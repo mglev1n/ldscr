@@ -1,25 +1,59 @@
 # Read ld from either internal or external file
-read_ld <- function(ancestry, ld) {
+
+read_ld <- function(ancestry, ld=NA, rsid=T, build="hg19") {
+
   if (missing(ancestry)) {
     x <- fs::dir_ls(ld, glob = "*.l2.ldscore.gz") %>%
-      vroom::vroom(col_types = vroom::cols())
+         vroom::vroom(col_types = vroom::cols())
   } else {
-    x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-      vroom::vroom(col_types = vroom::cols())
+    if(rsid){
+      x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
+           vroom::vroom(col_types = vroom::cols())
+    } else {
+      if (build=="hg19"){
+        x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid") %>%
+             vroom::vroom(col_types = vroom::cols())
+      } else if (build=="hg38"){
+        x <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid_hg38") %>%
+             vroom::vroom(col_types = vroom::cols())
+      } else {
+        print ("Only hg19/hg38 LDscore available")
+      }
+
+    }
   }
+
   return(x)
+
 }
 
 # Read wld from either internal or external file
-read_wld <- function(ancestry, wld) {
+
+read_wld <- function(ancestry, wld, rsid=T, build="hg19") {
+
   if (missing(ancestry)) {
     w <- fs::dir_ls(wld, glob = "*.l2.ldscore.gz") %>%
-      vroom::vroom(col_types = vroom::cols())
+         vroom::vroom(col_types = vroom::cols())
   } else {
-    w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
-      vroom::vroom(col_types = vroom::cols())
+    if(rsid){
+      w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz") %>%
+           vroom::vroom(col_types = vroom::cols())
+    } else {
+      if (build=="hg19"){
+        w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid") %>%
+             vroom::vroom(col_types = vroom::cols())
+      } else if (build=="hg38"){
+        w <- ldscore_files(ancestry, glob = "*.l2.ldscore.gz.norsid_hg38") %>%
+             vroom::vroom(col_types = vroom::cols())
+      } else {
+        print ("Only hg19/hg38 LDscore available")
+      }
+
+    }
   }
+
   return(w)
+
 }
 
 # Read M from either internal or external file
