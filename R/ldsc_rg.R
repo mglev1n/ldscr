@@ -68,7 +68,7 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   N.vec <- matrix(NA, nrow = 1, ncol = n.V)
   Liab.S <- rep(1, n.traits)
   I <- matrix(NA, nrow = n.traits, ncol = n.traits)
-  h2_res <- tibble()
+  h2_res <- tibble::tibble()
 
   # READ LD SCORES:
   cli::cli_progress_step("Reading LD Scores")
@@ -173,8 +173,8 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
           h2_lia <- h2_liability(h2 = analysis_res$reg.tot, sample_prev, population_prev)
 
           h2_res <- h2_res %>%
-            bind_rows(
-              tibble(
+            dplyr::bind_rows(
+              tibble::tibble(
                 trait = trait,
                 mean_chisq = mean.Chi,
                 lambda_gc = lambda.gc,
@@ -192,8 +192,8 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
             )
         } else {
           h2_res <- h2_res %>%
-            bind_rows(
-              tibble(
+            dplyr::bind_rows(
+              tibble::tibble(
                 trait = trait,
                 mean_chisq = mean.Chi,
                 lambda_gc = lambda.gc,
@@ -380,7 +380,7 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
   # Create results tibble with robust handling
   ind <- which(lower.tri(S, diag = F), arr.ind = TRUE)
 
-  rg_res <- tibble(
+  rg_res <- tibble::tibble(
     trait1 = dimnames(S_Stand)[[2]][ind[, 2]],
     trait2 = dimnames(S_Stand)[[1]][ind[, 1]],
     rg = S_Stand[ind],
