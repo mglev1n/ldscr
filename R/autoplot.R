@@ -1,3 +1,5 @@
+#' @exportS3Method ggplot2::autoplot
+
 autoplot.ldscr_list <- function(object, ...) {
   result <- object$raw
 

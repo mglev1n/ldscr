@@ -1,4 +1,4 @@
-#' Estimate cross-trait genetic correlations
+#' Estimate cross-trait genetic correlations (Robust Version)
 #'
 #' @description
 #'
@@ -6,6 +6,8 @@
 #'
 #' @details
 #' This function estimates the pairwise genetic correlations between an arbitrary number of traits. The function also estimates heritability for each individual trait. There is a [ggplot2::autoplot()] method for visualizing a heatmap of the results.
+#'
+#' This version handles cases where traits have non-positive heritability estimates more gracefully by returning NA values for correlations involving such traits.
 #'
 #' @param munged_sumstats (list) A named list of dataframes, or paths to files containing munged summary statistics. Each set of munged summary statistics contain at least columns named `SNP` (rsid), `A1` (effect allele), `A2` (non-effect allele), `N` (total sample size) and `Z` (Z-score)
 #' @param ancestry (character) One of "AFR", "AMR", "CSA", "EAS", "EUR", or "MID", which will utilize the appropriate built-in `ld` and `wld` files from Pan-UK Biobank. If empty or `NULL`, the user must specify paths to `ld` and `wld` files.
@@ -26,16 +28,6 @@
 #'
 #' @import dtplyr
 #' @import data.table
-#'
-#' @examples
-#' \dontrun{
-#' # Estimate genetic correlations between "APOB" and "LDL"
-#' ldsc_res <- ldsc_rg(munged_sumstats = list("APOB" = sumstats_munged_example(example = "APOB"), "LDL" = sumstats_munged_example(example = "LDL")), ancestry = "EUR")
-#'
-#' # Plot heatmap of results
-#' autoplot(ldsc_res)
-#' }
-#'
 
 ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev = NA, ld, wld, n_blocks = 200, chisq_max = NA, chr_filter = seq(1, 22, 1)) {
   # Check function arguments
@@ -303,8 +295,25 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     rownames(SE) <- rownames(S)
   }
 
+  ## ROBUST HANDLING OF NON-POSITIVE HERITABILITIES
+  # Initialize matrices
+  r <- nrow(S)
+  S_Stand <- matrix(NA, r, r)
+  SE_Stand <- matrix(NA, r, r)
+  V_Stand <- matrix(NA, nrow(V), ncol(V))
 
-  if (all(diag(S) > 0)) {
+  # Set row and column names
+  colnames(S_Stand) <- colnames(S)
+  rownames(S_Stand) <- rownames(S)
+  colnames(SE_Stand) <- colnames(S)
+  rownames(SE_Stand) <- rownames(S)
+
+  # Identify traits with positive heritability
+  positive_h2 <- diag(S) > 0
+
+  if (all(positive_h2)) {
+    cli::cli_alert_success("All traits have positive heritability estimates")
+
     ## calculate standardized results to print genetic correlations to log and screen
     ratio <- tcrossprod(1 / sqrt(diag(S)))
     S_Stand <- S * ratio
@@ -312,25 +321,63 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     # calculate the ratio of the rescaled and original S matrices
     scaleO <- gdata::lowerTriangle(ratio, diag = TRUE)
 
-    ## Make sure that if ratio in NaN (devision by zero) we put the zero back in
-    # -> not possible because of 'all(diag(S) > 0)'
-    # scaleO[is.nan(scaleO)] <- 0
-
     # rescale the sampling correlation matrix by the appropriate diagonals
     V_Stand <- V * tcrossprod(scaleO)
 
     # enter SEs from diagonal of standardized V
-    r <- nrow(S)
     SE_Stand <- matrix(0, r, r)
     SE_Stand[lower.tri(SE_Stand, diag = TRUE)] <- sqrt(diag(V_Stand))
 
     colnames(SE_Stand) <- colnames(S)
     rownames(SE_Stand) <- rownames(S)
+
   } else {
-    cli::cli_alert_warning("Your genetic covariance matrix includes traits estimated to have a negative heritability.")
+    # Handle case where some traits have non-positive heritability
+    non_positive_traits <- names(munged_sumstats)[!positive_h2]
+    cli::cli_alert_warning("Traits with non-positive heritability detected: {paste(non_positive_traits, collapse = ', ')}")
+    cli::cli_alert_info("Setting correlations involving these traits to NA")
+
+    # Set diagonal elements
+    diag(S_Stand) <- ifelse(positive_h2, 1, NA)
+    diag(SE_Stand) <- ifelse(positive_h2, 0, NA)
+
+    # Handle off-diagonal elements
+    for (i in 1:r) {
+      for (j in 1:r) {
+        if (i != j) {
+          if (positive_h2[i] && positive_h2[j]) {
+            # Both traits have positive heritability - calculate correlation
+            S_Stand[i, j] <- S[i, j] / sqrt(S[i, i] * S[j, j])
+
+            # Calculate SE using delta method approximation
+            # SE(rg) ≈ SE(cov) / sqrt(h2_i * h2_j) for small SEs
+            cov_index <- which(lower.tri(S, diag = TRUE), arr.ind = TRUE)
+            i_diag_idx <- which(cov_index[, 1] == i & cov_index[, 2] == i)
+            j_diag_idx <- which(cov_index[, 1] == j & cov_index[, 2] == j)
+
+            if (i < j) {
+              ij_idx <- which(cov_index[, 1] == j & cov_index[, 2] == i)
+            } else {
+              ij_idx <- which(cov_index[, 1] == i & cov_index[, 2] == j)
+            }
+
+            if (length(ij_idx) > 0 && length(i_diag_idx) > 0 && length(j_diag_idx) > 0) {
+              var_cov <- V[ij_idx, ij_idx]
+              SE_Stand[i, j] <- sqrt(var_cov) / sqrt(S[i, i] * S[j, j])
+            } else {
+              SE_Stand[i, j] <- NA
+            }
+          } else {
+            # At least one trait has non-positive heritability
+            S_Stand[i, j] <- NA
+            SE_Stand[i, j] <- NA
+          }
+        }
+      }
+    }
   }
 
-
+  # Create results tibble with robust handling
   ind <- which(lower.tri(S, diag = F), arr.ind = TRUE)
 
   rg_res <- tibble(
@@ -338,7 +385,9 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     trait2 = dimnames(S_Stand)[[1]][ind[, 1]],
     rg = S_Stand[ind],
     rg_se = SE_Stand[ind],
-    rg_p = 2 * pnorm(abs(rg / rg_se), lower.tail = FALSE)
+    rg_p = ifelse(is.na(S_Stand[ind]) | is.na(SE_Stand[ind]),
+                  NA,
+                  2 * pnorm(abs(S_Stand[ind] / SE_Stand[ind]), lower.tail = FALSE))
   )
 
   output <- list(
@@ -349,7 +398,5 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
   class(output) <- c("ldscr_list", "list")
 
-  return(
-    output
-  )
+  return(output)
 }

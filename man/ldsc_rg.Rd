@@ -2,7 +2,7 @@
 % Please edit documentation in R/ldsc_rg.R
 \name{ldsc_rg}
 \alias{ldsc_rg}
-\title{Estimate cross-trait genetic correlations}
+\title{Estimate cross-trait genetic correlations (Robust Version)}
 \usage{
 ldsc_rg(
   munged_sumstats,
@@ -48,14 +48,6 @@ A list of class \code{ldscr_list} containing heritablilty and genetic correlatio
 }
 \details{
 This function estimates the pairwise genetic correlations between an arbitrary number of traits. The function also estimates heritability for each individual trait. There is a \code{\link[ggplot2:autoplot]{ggplot2::autoplot()}} method for visualizing a heatmap of the results.
-}
-\examples{
-\dontrun{
-# Estimate genetic correlations between "APOB" and "LDL"
-ldsc_res <- ldsc_rg(munged_sumstats = list("APOB" = sumstats_munged_example(example = "APOB"), "LDL" = sumstats_munged_example(example = "LDL")), ancestry = "EUR")
 
-# Plot heatmap of results
-autoplot(ldsc_res)
-}
-
+This version handles cases where traits have non-positive heritability estimates more gracefully by returning NA values for correlations involving such traits.
 }
