@@ -330,7 +330,6 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
 
     colnames(SE_Stand) <- colnames(S)
     rownames(SE_Stand) <- rownames(S)
-
   } else {
     # Handle case where some traits have non-positive heritability
     non_positive_traits <- names(munged_sumstats)[!positive_h2]
@@ -386,8 +385,9 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
     rg = S_Stand[ind],
     rg_se = SE_Stand[ind],
     rg_p = ifelse(is.na(S_Stand[ind]) | is.na(SE_Stand[ind]),
-                  NA,
-                  2 * pnorm(abs(S_Stand[ind] / SE_Stand[ind]), lower.tail = FALSE))
+      NA,
+      2 * pnorm(abs(S_Stand[ind] / SE_Stand[ind]), lower.tail = FALSE)
+    )
   )
 
   output <- list(
