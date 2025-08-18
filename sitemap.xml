@@ -1,42 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/404.html</loc>
-  </url>
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/index.html</loc>
-  </url>
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/reference/h2_liability.html</loc>
-  </url>
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/reference/ldsc_h2.html</loc>
-  </url>
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/reference/ldsc_rg.html</loc>
-  </url>
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/reference/ldscore_files.html</loc>
-  </url>
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/reference/ldscr-package.html</loc>
-  </url>
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/reference/pipe.html</loc>
-  </url>
-  <url>
-    <loc>https://mglev1n.github.io/ldscr/reference/sumstats_munged_example.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://mglev1n.github.io/ldscr/404.html</loc></url>
+<url><loc>https://mglev1n.github.io/ldscr/LICENSE-text.html</loc></url>
+<url><loc>https://mglev1n.github.io/ldscr/LICENSE.html</loc></url>
+<url><loc>https://mglev1n.github.io/ldscr/authors.html</loc></url>
+<url><loc>https://mglev1n.github.io/ldscr/index.html</loc></url>
+<url><loc>https://mglev1n.github.io/ldscr/reference/h2_liability.html</loc></url>
+<url><loc>https://mglev1n.github.io/ldscr/reference/index.html</loc></url>
+<url><loc>https://mglev1n.github.io/ldscr/reference/ldsc_h2.html</loc></url>
+<url><loc>https://mglev1n.github.io/ldscr/reference/ldsc_rg.html</loc></url>
+<url><loc>https://mglev1n.github.io/ldscr/reference/ldscore_files.html</loc></url>
+<url><loc>https://mglev1n.github.io/ldscr/reference/ldscr-package.html</loc></url>
+<url><loc>https://mglev1n.github.io/ldscr/reference/pipe.html</loc></url>
+<url><loc>https://mglev1n.github.io/ldscr/reference/sumstats_munged_example.html</loc></url>
 </urlset>
+
