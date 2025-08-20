@@ -135,8 +135,8 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
         trait <- names(munged_sumstats[j])
         cli::cli_progress_step("Estimating heritability for '{trait}'")
 
-        samp.prev <- sample_prev[j]
-        pop.prev <- population_prev[j]
+        samp.prev <- sample_prev[[j]]
+        pop.prev <- population_prev[[j]]
 
         merged <- y1
         n.snps <- nrow(merged)
@@ -167,10 +167,10 @@ ldsc_rg <- function(munged_sumstats, ancestry, sample_prev = NA, population_prev
         ratio <- (analysis_res$intercept - 1) / (mean.Chi - 1)
         ratio.se <- analysis_res$intercept.se / (mean.Chi - 1)
 
-        if (is.na(population_prev) == F & is.na(sample_prev) == F) {
+        if (is.na(pop.prev) == F & is.na(samp.prev) == F) {
           # conversion.factor <- (population_prev^2 * (1 - population_prev)^2) / (sample_prev * (1 - sample_prev) * dnorm(qnorm(1 - population_prev))^2)
           # Liab.S <- conversion.factor
-          h2_lia <- h2_liability(h2 = analysis_res$reg.tot, sample_prev, population_prev)
+          h2_lia <- h2_liability(h2 = analysis_res$reg.tot, samp.prev, pop.prev)
 
           h2_res <- h2_res %>%
             dplyr::bind_rows(
